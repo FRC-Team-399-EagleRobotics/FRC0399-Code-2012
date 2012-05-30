@@ -6,7 +6,6 @@ package org.team399.y2012.robot.Systems;
 
 import edu.wpi.first.wpilibj.AnalogChannel;
 import org.team399.y2012.robot.Config.RobotIOMap;
-import org.team399.y2012.robot.LinearVictor;
 
 /**
  * Class encapsulating the entire intake conveyor belt system, including dropper

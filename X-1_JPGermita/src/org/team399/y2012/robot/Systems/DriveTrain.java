@@ -233,4 +233,32 @@ public class DriveTrain {
         yaw.reset();
         pitch.reset();
     }
+    
+    double error = 0;
+    double prevError = 0;
+
+    /**
+     * Drive to a specified angle. 
+     * @param throttle Throttle to drive forward
+     * @param angle angle to drive to
+     */
+    public void driveToAngle(double throttle, double angle) {
+        double P = -.3,
+                D = 0;
+        error = angle - getAngle();
+        double proportional = P * error;
+        double derivative = error - prevError;
+        double PID_Out = proportional - D * derivative;
+        prevError = error;
+//        System.out.println("Angle: " + getAngle());
+        tankDrive((throttle) - PID_Out, (throttle) + PID_Out);
+    }
+
+    
+    public void lowGear() {
+        shifter.set(true);
+    }
+    public void highGear() {
+        shifter.set(false);
+    }
 }

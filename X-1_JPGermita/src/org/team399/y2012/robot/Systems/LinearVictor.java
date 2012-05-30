@@ -1,6 +1,6 @@
 // This is a victor that has its output curve corrected to be linear
 // Victors tend to have a log-like signal/output ratio
-package org.team399.y2012.robot;
+package org.team399.y2012.robot.Systems;
 
 import edu.wpi.first.wpilibj.Victor;
 

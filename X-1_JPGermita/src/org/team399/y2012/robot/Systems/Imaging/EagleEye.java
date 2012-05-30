@@ -130,31 +130,7 @@ public class EagleEye {
     int prevDemoCtr = 0;
 
     public void demoMode() {
-//        double[] ORANGE = {1.000, .2705, 0.000};
-//        double[] PURPLE = {.5764, .4392, .8588};
-//        double[] GREEN =  {0.000, 1.000, .0200};
-//        double[] WHITE =  {.9019, 1.000, 1.000};
-//        double[][] colors = {ORANGE, PURPLE, GREEN, WHITE};
-//        
-//        if(demoCounter > colors.length) demoCounter = 0;
-//        if(prevDemoCtr > colors.length) prevDemoCtr = 0;
-//        
-//        double stepRate = 50;
-//        
-//        double rStep = colors[prevDemoCtr][0] - colors[demoCounter][0];
-//        double gStep = colors[prevDemoCtr][1] - colors[demoCounter][1];
-//        double bStep = colors[prevDemoCtr][2] - colors[demoCounter][2];
-//        
-//        rStep /= stepRate;
-//        gStep /= stepRate;
-//        bStep /= stepRate;
-//        
-//        for(int i = 0; i < 100; i++) {
-//            ring.setRGB(colors[prevDemoCtr][0] - (rStep*i), colors[prevDemoCtr][1] - (gStep*i), colors[prevDemoCtr][1] - (bStep*i));
-//        }
-//        
-//        prevDemoCtr = demoCounter;
-//        demoCounter++;
+
         demoCounter++;
 
         if (demoCounter < 250) {
@@ -162,6 +138,7 @@ public class EagleEye {
         } else if (demoCounter > 250 && demoCounter < 500) {
             ring.setRGB(.9019, 1.000, 1.000);
         } else if (demoCounter > 500 && demoCounter < 750) {
+            ring.setRGB(0.0, 0.0, 1.0);
         } else if (demoCounter > 750) {
             demoCounter = 0;
         }
