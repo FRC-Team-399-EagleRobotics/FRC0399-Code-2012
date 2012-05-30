@@ -1,0 +1,6 @@
+MIDlet-Name: X-1_JPGermita
+MIDlet-Version: 1.0.0
+MIDlet-Vendor: FIRST
+MIDlet-1: Main, , org.team399.y2012.robot.Main
+MicroEdition-Profile: IMP-1.0
+MicroEdition-Configuration: CLDC-1.1
