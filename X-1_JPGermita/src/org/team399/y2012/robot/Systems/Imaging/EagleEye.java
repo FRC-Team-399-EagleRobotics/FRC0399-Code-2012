@@ -5,6 +5,7 @@
 package org.team399.y2012.robot.Systems.Imaging;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import org.team399.y2012.Utilities.EagleMath;
 import org.team399.y2012.robot.Config.RobotIOMap;
 import org.team399.y2012.robot.Systems.Imaging.ImageTracker.Target;
 
@@ -19,15 +20,24 @@ public class EagleEye {
     public Camera cam;
     private Target[] targets;
     //Color Thresholds
-    Color[] colors = {Color.fromRGB(1, 1, 1)}; //Colors
-    Threshold[] thresholds = {new Threshold(110, 130, 80, 255, 120, 255)};
+    Color[] colors = {
+        Color.fromRGB(0, 1, 0), //Green color
+        Color.fromRGB(1, 0, 0), //Red color
+        Color.fromRGB(0, 0, 1) //blue color
+    }; //Colors
+    Threshold[] thresholds = {
+        new Threshold(110, 130, 80, 255, 120, 255), //Green threshold
+        new Threshold(0, 45, 80, 255, 120, 255), //Red threshold
+        new Threshold(200, 240, 80, 255, 120, 255) //Blue threshold
+    };
 
     /**
      * Constructor
      */
     public EagleEye() {
-        cam = new Camera(); //Init camera
         ring = new LightRing(RobotIOMap.LIGHT_RING_R, RobotIOMap.LIGHT_RING_G, RobotIOMap.LIGHT_RING_B); //init light ring
+        ring.setRGB(0, 0, 0);
+        cam = new Camera(); //Init camera
         if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kBlue)) {
             ring.setRGB(0, 0, 1);
         } else if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kRed)) {
@@ -35,35 +45,40 @@ public class EagleEye {
         } else if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kInvalid)) {
             ring.setRGB(0, 1, 0);
         }
-        ring.setRGB(0, 1, 0);
+        //ring.setRGB(0, 1, 0);
         System.out.println("[EAGLE-EYE] Eagle Eye initialized");
     }
     int colorCount = 0;
     int loopCount = 0;
     boolean targetsFound = false;
+    int colorIndex = 0;
 
     /**
      * Main run method. Call this for functionality.
      */
     public void run() {
-        //ring.setRGB(colors[colorCount].getRed(),
-        //            colors[colorCount].getGreen(),
-        //            colors[colorCount].getBlue());
+        //ring.setRGB(0, 1, 0);
+        ring.set(colors[colorIndex]);
+
         loopCount++;
         if (cam.freshImage()) {
-            targets = ImageTracker.processImage(cam.getImage(), thresholds[0]);
-            if (targets != null && targets.length > 0) {
-                targetsFound = true;
-                System.out.println("[EAGLE-EYE] Targets Found!!! " + targets.length);
+
+            targets = ImageTracker.processImage(cam.getImage(), thresholds[colorIndex]);    //Process image from camera using given thresholds
+
+            if (targets != null && targets.length > 0) {    //If targets are detected
+
+                targetsFound = true;                        //Set flag to true
+                System.out.println("[EAGLE-EYE] Targets Found!!! " + targets.length);   //Print number of targets
+
             } else {
                 targetsFound = false;
+                if (System.currentTimeMillis() % 8000 < 7950) {
+                    colorIndex++;
+                    colorIndex = (colorIndex > colors.length) ? 0 : colorIndex;
+                }
             }
         }
 
-
-        if (loopCount % 50 == 0) {
-            colorCount = (colorCount + 1) % colors.length;//Math.min(colors.length, thresholds.length);
-        }
     }
 
     /**
@@ -74,73 +89,55 @@ public class EagleEye {
         return targetsFound;
     }
 
-    /**
-     * Returns a target based on its size
-     * @param index lower index == smaller size
-     * @return 
-     */
-    public Target getTarget(int index) {
-        return targets[index];
-    }
-
-    public Target getTarget(String which) {
-        Target buffer = (targets[0] == null) ? null : targets[0];
-        if (which.equals("HIGH")) {
-            for (int i = 0; i < targets.length; i++) {
-                if (buffer.y < targets[i].y) {
-                    buffer = targets[i];
-                }
-            }
-        } else if (which.equals("LEFT")) {
-            for (int i = 0; i < targets.length; i++) {
-                if (buffer.x < targets[i].x) {
-                    buffer = targets[i];
-                }
-            }
-        } else if (which.equals("RIGHT")) {
-            for (int i = 0; i < targets.length; i++) {
-                if (buffer.x > targets[i].x) {
-                    buffer = targets[i];
-                }
-            }
-        } else if (which.equals("LOW")) {
-            for (int i = 0; i < targets.length; i++) {
-                if (buffer.y > targets[i].y) {
-                    buffer = targets[i];
-                }
-            }
-        }
-
-        return buffer;
-    }
-
     public Target[] getTargets() {
         return targets;
     }
-    private String whichTarget = "";
 
-    public void setTarget(String which) {
-        whichTarget = which;
+    public Target getTallestTarget() {
+        if (targets == null) {
+            return null;
+        }
+        Target tallest = targets[0];
+        for (int i = 1; i < targets.length; i++) {
+            if (targets[i].y > tallest.y) {
+                tallest = targets[i];
+            }
+        }
+        return tallest;
     }
-
-    public Target getSetTarget() {
-        return getTarget(whichTarget);
-    }
-    int demoCounter = 0;
-    int prevDemoCtr = 0;
 
     public void demoMode() {
+        long timer = System.currentTimeMillis();
+        timer = timer % 16500;
 
-        demoCounter++;
+        Color[] patriotic = {
+            Color.fromRGB(1, 0, 0),
+            Color.fromRGB(.9, 1, 1),
+            Color.fromRGB(0, 1, 0),};
 
-        if (demoCounter < 250) {
-            ring.setRGB(1.0, 0.0, 0.0);
-        } else if (demoCounter > 250 && demoCounter < 500) {
-            ring.setRGB(.9019, 1.000, 1.000);
-        } else if (demoCounter > 500 && demoCounter < 750) {
-            ring.setRGB(0.0, 0.0, 1.0);
-        } else if (demoCounter > 750) {
-            demoCounter = 0;
+        Color[] teamSpirit = {
+            Color.fromHSL(20, 255, 50),
+            Color.fromHSL(120, 255, 50),
+            Color.fromHSL(275, 255, 50),};
+
+        Color[] demoColors = teamSpirit;
+
+
+        if (EagleMath.isInBand(timer, 0, 5000)) {
+            ring.set(demoColors[0]);
+        } else if (EagleMath.isInBand(timer, 5500, 10500)) {
+            ring.set(demoColors[1]);
+        } else if (timer > 1100) {
+            ring.set(demoColors[2]);
+        } else {
+            long fadeTimer = (timer % 500);
+            double rStep = ring.getColor().getRed() / 500;
+            double gStep = ring.getColor().getGreen() / 500;
+            double bStep = ring.getColor().getBlue() / 500;
+            ring.set(Color.fromRGB(
+                    ring.getColor().getRed() - (fadeTimer * rStep),
+                    ring.getColor().getGreen() - (fadeTimer * gStep),
+                    ring.getColor().getBlue() - (fadeTimer * bStep)));
         }
     }
 }

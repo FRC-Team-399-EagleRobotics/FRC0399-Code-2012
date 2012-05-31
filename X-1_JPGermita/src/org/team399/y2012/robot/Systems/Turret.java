@@ -41,5 +41,35 @@ public class Turret {
      * @param angle 
      */
     public void setAngle(double angle) {
+        try {
+            m_turret.setX(angle);// - 3);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+    
+    public double getPosition() {
+        try {
+            return m_turret.getPosition();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public double getAngle() {
+        try {
+            return m_turret.getX();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public boolean isAtAngle() {
+        return Math.abs(getAngle() - getPosition()) < .00005;
+    }
+    
+    
 }

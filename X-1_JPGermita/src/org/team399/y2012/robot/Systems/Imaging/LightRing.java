@@ -69,4 +69,8 @@ public class LightRing {
     public void setBlue(double power) {
         current.setBlue(power);
     }
+    
+    public Color getColor() {
+        return current;
+    }
 }
