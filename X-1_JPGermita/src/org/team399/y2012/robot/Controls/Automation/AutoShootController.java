@@ -41,7 +41,7 @@ public class AutoShootController {
         
     }
     
-    public void shoot(int distance, double beltSpeed) {
-        shoot(m_assc.distanceToRPM((double)distance), beltSpeed);
+    public void shootDist(double distance, double beltSpeed) {
+        shoot(m_assc.distanceToRPM(distance), beltSpeed);
     }
 }

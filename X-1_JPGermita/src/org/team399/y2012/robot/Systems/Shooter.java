@@ -94,8 +94,12 @@ public class Shooter {
         prevPrevErr = prevErr;
         prevErr = err;
         err = setPointV - getEncoderRate();
-
-        out += -.000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);
+        
+        if(setPointV < 200) {   //Set some deadband on velocity control
+            out = 0;            //If commanded a very low speed, coast to a stop
+        } else {
+            out += -.000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);
+        }
 
         if (out > 1) {
             out = 1;
@@ -103,7 +107,16 @@ public class Shooter {
         if (out < -1) {
             out = -1;
         }
-        setWheelVoltage(out);
+        
+        shoot();
+    }
+    
+    public void shoot() {
+        if(enabled) {
+            setWheelVoltage(out);
+        } else {
+            setWheelVoltage(0);
+        }
     }
     
     public boolean isAtTargetSpeed() {
@@ -121,6 +134,12 @@ public class Shooter {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    private boolean enabled = true;
+    
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     /**
