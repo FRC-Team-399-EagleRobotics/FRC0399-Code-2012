@@ -38,7 +38,7 @@ public class AutoAimController {
                 double xErr = 240 - m_eye.getTallestTarget().x;
 
                 double angle = MathUtils.asin(xErr / targetDistance);
-                m_turret.setAngle(angle);
+                m_turret.setAngle(m_turret.getAngle()-angle);
             }
         }
     }

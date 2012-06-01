@@ -52,6 +52,7 @@ public class EagleEye {
     int loopCount = 0;
     boolean targetsFound = false;
     int colorIndex = 0;
+    long timeLastTarget = 0;
 
     /**
      * Main run method. Call this for functionality.
@@ -69,16 +70,15 @@ public class EagleEye {
 
                 targetsFound = true;                        //Set flag to true
                 System.out.println("[EAGLE-EYE] Targets Found!!! " + targets.length);   //Print number of targets
-
+                timeLastTarget = System.currentTimeMillis();
             } else {
                 targetsFound = false;
-                if (System.currentTimeMillis() % 8000 < 7950) {
+                if ((System.currentTimeMillis()- timeLastTarget) % 5000 < 4950) {
                     colorIndex++;
                     colorIndex = (colorIndex > colors.length) ? 0 : colorIndex;
                 }
             }
         }
-
     }
 
     /**
@@ -127,17 +127,17 @@ public class EagleEye {
             ring.set(demoColors[0]);
         } else if (EagleMath.isInBand(timer, 5500, 10500)) {
             ring.set(demoColors[1]);
-        } else if (timer > 1100) {
+        } else if (EagleMath.isInBand(timer, 11000, 15000)) {
             ring.set(demoColors[2]);
         } else {
             long fadeTimer = (timer % 500);
             double rStep = ring.getColor().getRed() / 500;
             double gStep = ring.getColor().getGreen() / 500;
             double bStep = ring.getColor().getBlue() / 500;
-            ring.set(Color.fromRGB(
+            ring.setRGB(
                     ring.getColor().getRed() - (fadeTimer * rStep),
                     ring.getColor().getGreen() - (fadeTimer * gStep),
-                    ring.getColor().getBlue() - (fadeTimer * bStep)));
+                    ring.getColor().getBlue() - (fadeTimer * bStep));
         }
     }
 }
