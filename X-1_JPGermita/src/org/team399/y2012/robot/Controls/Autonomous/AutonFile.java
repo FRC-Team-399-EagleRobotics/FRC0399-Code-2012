@@ -1,0 +1,62 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.team399.y2012.robot.Controls.Autonomous;
+
+import java.io.InputStream;
+import org.team399.y2012.Utilities.StringUtils;
+
+/**
+ *
+ * @author Jeremy
+ */
+public class AutonFile {
+
+    private String m_filename;
+    private String[][] parsedFile;
+
+    public AutonFile(String filename) {
+        this.m_filename = filename;
+        read();
+    }
+
+    
+    private void read() {
+        InputStream is = getClass().getResourceAsStream("help.txt");
+        StringBuffer sb = new StringBuffer();
+        try {
+            int chars;
+            while ((chars = is.read()) != -1) {
+                sb.append((char) chars);
+            }
+        } catch (Exception e) {
+        }
+        
+        String NL = System.getProperty("line.separator");
+        System.out.println("Read from file:");
+        String file = sb.toString();
+        String[] lines = StringUtils.split(file, NL);
+        String[][] elements = new String[lines.length][];
+
+        System.out.println("Lines Parsed: " + lines.length);
+        for (int i = 0; i < lines.length; i++) {
+            System.out.println(i + ": " + lines[i]);
+            elements[i] = StringUtils.split(lines[i], ", ");
+            System.out.println("Elements Parsed: " + elements[i].length);
+        }
+        parsedFile = elements;
+    }
+    
+    public String[][] getParsedFile() {
+        return parsedFile;
+    }
+
+    public void reload() {
+        read();
+    }
+    public void reload(String filename) {
+        this.m_filename = filename;
+        read();
+    }
+}

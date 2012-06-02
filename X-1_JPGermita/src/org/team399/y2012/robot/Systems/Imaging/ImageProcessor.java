@@ -16,7 +16,7 @@ import java.util.Vector;
  *
  * @author JustinLaptop
  */
-public class ImageTracker {
+public class ImageProcessor {
 
     public static final double areaThresh = 444;
     public static final double rectThresh = 70;
@@ -135,7 +135,7 @@ public class ImageTracker {
                 //System.out.println("Target #" + i + ":");
                 //System.out.println(targets[i].toString());
             }
-            ImageTracker.Target focus = targets[0];
+            ImageProcessor.Target focus = targets[0];
             if (index == 0) {
                 for (int i = 0; i < targets.length; i++) {
                     if (focus.y < targets[i].y) {

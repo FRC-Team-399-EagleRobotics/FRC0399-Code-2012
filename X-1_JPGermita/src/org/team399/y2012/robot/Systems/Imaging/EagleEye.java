@@ -7,7 +7,7 @@ package org.team399.y2012.robot.Systems.Imaging;
 import edu.wpi.first.wpilibj.DriverStation;
 import org.team399.y2012.Utilities.EagleMath;
 import org.team399.y2012.robot.Config.RobotIOMap;
-import org.team399.y2012.robot.Systems.Imaging.ImageTracker.Target;
+import org.team399.y2012.robot.Systems.Imaging.ImageProcessor.Target;
 
 /**
  * Eagle Eye class. Encapsulates camera, ImageTracker, and the RGB light ring into one class.
@@ -64,7 +64,7 @@ public class EagleEye {
         loopCount++;
         if (cam.freshImage()) {
 
-            targets = ImageTracker.processImage(cam.getImage(), thresholds[colorIndex]);    //Process image from camera using given thresholds
+            targets = ImageProcessor.processImage(cam.getImage(), thresholds[colorIndex]);    //Process image from camera using given thresholds
 
             if (targets != null && targets.length > 0) {    //If targets are detected
 
@@ -134,8 +134,7 @@ public class EagleEye {
             double rStep = ring.getColor().getRed() / 500;
             double gStep = ring.getColor().getGreen() / 500;
             double bStep = ring.getColor().getBlue() / 500;
-            ring.setRGB(
-                    ring.getColor().getRed() - (fadeTimer * rStep),
+            ring.setRGB(ring.getColor().getRed() - (fadeTimer * rStep),
                     ring.getColor().getGreen() - (fadeTimer * gStep),
                     ring.getColor().getBlue() - (fadeTimer * bStep));
         }

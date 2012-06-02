@@ -128,14 +128,15 @@ public class DriveTrain {
      */
     public void cheesyDrive(double left, double right, boolean quickTurn) {
 
-        double wheel = twoStickToTurning(left, right);
+        double wheel = twoStickToTurning(left, right);      //Convert inputs for processing
         double throttle = twoStickToThrottle(left, right);
 
-        if (!shifter.get()) {
+        if (!shifter.get()) {           //Adjuts turning sensitivity value depending on high/low gear
             tSens = TURBO_MODE_TSENS;
         } else {
             tSens = NORMAL_MODE_TSENS;
         }
+        
         double angular_power = 0.0;
         double overPower = 0.0;
         double sensitivity = tSens;
@@ -197,7 +198,7 @@ public class DriveTrain {
     }
 
     /**
-     * Get the angle from the gyro
+     * Get the angle from the yaw gyro. Uses some logic to normalize angle to 0-360 range
      * @return
      */
     public double getAngleWraparound() {
@@ -255,9 +256,16 @@ public class DriveTrain {
     }
 
     
+    /**
+     * Puts the drivetrain into low gear
+     */
     public void lowGear() {
         shifter.set(true);
     }
+    
+    /**
+     * Puts the drivetrain into high gear
+     */
     public void highGear() {
         shifter.set(false);
     }

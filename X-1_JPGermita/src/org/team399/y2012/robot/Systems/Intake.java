@@ -5,6 +5,7 @@
 package org.team399.y2012.robot.Systems;
 
 import edu.wpi.first.wpilibj.AnalogChannel;
+import edu.wpi.first.wpilibj.Solenoid;
 import org.team399.y2012.robot.Config.RobotIOMap;
 
 /**
@@ -12,20 +13,21 @@ import org.team399.y2012.robot.Config.RobotIOMap;
  * @author Jeremy
  */
 public class Intake {
-
-
-    LinearVictor m_intake;
-    AnalogChannel m_ballSensor;
     
-    private final double hasBallThresh = 0.0;
+    LinearVictor m_intake;      //Linearized victor speed controller for intake motor
+    AnalogChannel m_ballSensor; //Analog channel for VEX line sensor
+    Solenoid m_dropper;         //Solenoid for bridge mechanism
+    
+    private final double hasBallThresh = 0.0;   //Threshold
+    //TODO: Tweak this value for real ball
 
     /**
      * Constructor
      */
     public Intake() {
         m_intake = new LinearVictor(RobotIOMap.INTAKE_CONVEYOR_PWM);
-        //Add dropper pneumatics
         m_ballSensor = new AnalogChannel(RobotIOMap.BALL_SENSOR);
+        m_dropper = new Solenoid(RobotIOMap.DROPPER_PORT);
     }
 
     /**
@@ -41,8 +43,13 @@ public class Intake {
      * @param value 
      */
     public void setDropper(boolean value) {
+        m_dropper.set(value);
     }
     
+    /**
+     * returns true if the analog ball sensor's value appears to be that of a ball's
+     * @return 
+     */
     public boolean hasBall() {
         return m_ballSensor.getVoltage() > hasBallThresh;
     }
