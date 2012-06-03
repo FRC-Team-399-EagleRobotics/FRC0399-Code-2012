@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.*;
  */
 public class Main extends IterativeRobot {
 
-    Robot bot;
+    public static Robot bot;
     
     /**
      * This function is run when the robot is first started up and should be
