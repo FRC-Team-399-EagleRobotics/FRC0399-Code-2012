@@ -9,7 +9,7 @@ import org.team399.y2012.Utilities.StringUtils;
 import org.team399.y2012.robot.Main;
 
 /**
- *
+ * Class to interpret data parsed from file
  * @author Jeremy
  */
 public class AutonInterpreter {
@@ -17,12 +17,19 @@ public class AutonInterpreter {
     private String[][] m_parsedFile;
     long autonStartTime = 0;
 
+    /**
+     * Constructor
+     * @param parsedFile string array containing the data from the parsed file
+     */
     public AutonInterpreter(String[][] parsedFile) {
         this.m_parsedFile = parsedFile;
         autonStartTime = System.currentTimeMillis();
     }
     long commandStartTime = 0;
-
+    
+    /**
+     * Call this to run the autonomous from file
+     */
     public void run() {
         long commandStartTime = System.currentTimeMillis();
         if ((15000 - (System.currentTimeMillis() - autonStartTime)) < 10000) {
@@ -75,12 +82,20 @@ public class AutonInterpreter {
         } else if (command.equals("DROPPER")) {
             Main.bot.intake.setDropper(args[0] == 1.0);
         } else if (command.equals("AUTOSHOOT")) {
-            Main.bot.shootController.shoot(args[1], args[0]);
+            if(System.currentTimeMillis() - commandStartTime < args[2]) {
+                Main.bot.shootController.shoot(args[1], args[0]);
+            } else {
+                return true;
+            }
         } else if (command.equals("DRIVE_DISTANCE")) {
             //Autodrivetrain controller stuff here
         } else if (command.endsWith("TURN_ANGLE")) {
             Main.bot.drive.driveToAngle(0, args[0]);
-            if (EagleMath.isInBand(Math.abs(args[0] - Main.bot.drive.getAngle()), 0, 10)) {
+            if(System.currentTimeMillis() - commandStartTime < args[1]) {
+                if (EagleMath.isInBand(Math.abs(args[0] - Main.bot.drive.getAngle()), 0, 10)) {
+                    return true;
+                }
+            } else {
                 return true;
             }
             return false;

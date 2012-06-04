@@ -1,0 +1,11 @@
+% Sample Autonomous
+% The percent symbol denotes a comment
+# The pound symbol works too
+AUTOSHOOT, 1, 2300, 5000
+DROPPER, 0
+DRIVE_POWER, .7, .7, 0
+BELT, 1
+WAIT, 2000
+DRIVE_POWER, 0, 0, 0
+AUTOSHOOT, 1, 2800, 5000
+STOP
