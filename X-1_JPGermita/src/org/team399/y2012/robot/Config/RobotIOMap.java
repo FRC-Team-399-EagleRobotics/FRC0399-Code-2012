@@ -36,10 +36,6 @@ public class RobotIOMap {
      */
     public static final int SHOOTER_B_ID = 7;
     /**
-     * Hood motor ID
-     */
-    public static final int HOOD_ID = 9;
-    /**
      * Turret motor ID
      */
     public static final int TURRET_ID = 8;
@@ -55,6 +51,9 @@ public class RobotIOMap {
      * Gyro - Pitch axis analog port
      */
     public static final int GYRO_PITCH = 2;
+    /**
+     * Conveyor belt ball sensor port
+     */
     public static final int BALL_SENSOR = 3;
     //Digital outputs/Inputs
     /**
@@ -73,9 +72,6 @@ public class RobotIOMap {
      * Pressure switch digital output
      */
     public static final int PRESSURE_SWITCH = 4;
-    
-    
-    
     //PWM outputs
     public static final int CAM_TILT_SERVO_PWM = 3;
     /**
@@ -92,6 +88,10 @@ public class RobotIOMap {
      * Dropper solenoid port
      */
     public static final int DROPPER_PORT = 1;
+    /**
+     * hood solenoid port
+     */
+    public static final int HOOD_PORT = 1;
     /**
      * Shifter solenoid port
      */

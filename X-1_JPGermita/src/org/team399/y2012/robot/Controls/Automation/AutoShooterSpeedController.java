@@ -8,24 +8,22 @@ import com.sun.squawk.util.MathUtils;
 import org.team399.y2012.robot.Systems.Shooter;
 
 /**
- *
+ * A class to provide some functions for automatic shooter speed control
  * @author Jeremy
  */
 public class AutoShooterSpeedController {
 
-    private Shooter m_shooter;
-    private double[][] setDistRanges_LUT = {
+    private static double[][] setDistRanges_LUT = {
         {0, 0, 0}, //Fender front shot distance range
         {0, 0, 0} //Key Shot distance range
     };
 
     /**
-     * Constructor
+     * Applies inverse of distance function to get a speed for the shooter to use
+     * @param distance distance in inches
+     * @return an RPM for the shooter
      */
-    public AutoShooterSpeedController() {
-    }
-
-    public double distanceToRPM(double distance) {
+    public static double distanceToRPM(double distance) {
 //        return distance;
 
         /*double answer = MathUtils.pow(distance-3000, 3);

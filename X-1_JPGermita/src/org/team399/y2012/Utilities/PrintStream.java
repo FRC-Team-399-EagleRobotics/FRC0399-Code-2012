@@ -33,6 +33,10 @@ public class PrintStream {
         this.suffix = suffix;
     }
 
+    /**
+     * Prints data with suffix and prefix
+     * @param data 
+     */
     public void println(String data) {
         System.out.println(suffix + data + prefix);
     }

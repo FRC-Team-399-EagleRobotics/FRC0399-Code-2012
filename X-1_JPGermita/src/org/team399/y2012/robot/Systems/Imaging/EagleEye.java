@@ -89,23 +89,34 @@ public class EagleEye {
         return targetsFound;
     }
 
+    /**
+     * Get the entire array for targets
+     * @return 
+     */
     public Target[] getTargets() {
         return targets;
     }
 
+    /**
+     * Returns the target with the highest Y value
+     * @return 
+     */
     public Target getTallestTarget() {
         if (targets == null) {
             return null;
         }
         Target tallest = targets[0];
         for (int i = 1; i < targets.length; i++) {
-            if (targets[i].y > tallest.y) {
+            if (targets[i].y < tallest.y) {
                 tallest = targets[i];
             }
         }
         return tallest;
     }
 
+    /**
+     * A demonstration mode for the light ring. Flashes nifty colors.
+     */
     public void demoMode() {
         long timer = System.currentTimeMillis();
         timer = timer % 16500;

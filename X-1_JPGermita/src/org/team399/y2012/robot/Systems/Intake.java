@@ -13,11 +13,10 @@ import org.team399.y2012.robot.Config.RobotIOMap;
  * @author Jeremy
  */
 public class Intake {
-    
+
     LinearVictor m_intake;      //Linearized victor speed controller for intake motor
     AnalogChannel m_ballSensor; //Analog channel for VEX line sensor
     Solenoid m_dropper;         //Solenoid for bridge mechanism
-    
     private final double hasBallThresh = 0.0;   //Threshold
     //TODO: Tweak this value for real ball
 
@@ -45,7 +44,7 @@ public class Intake {
     public void setDropper(boolean value) {
         m_dropper.set(value);
     }
-    
+
     /**
      * returns true if the analog ball sensor's value appears to be that of a ball's
      * @return 

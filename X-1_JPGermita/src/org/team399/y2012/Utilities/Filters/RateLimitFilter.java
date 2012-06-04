@@ -16,10 +16,19 @@ public class RateLimitFilter {
     private double currData = 0.0;
     private double prevData = 0.0;
 
+    
+    /**
+     * Constructor
+     * @param limit Maximum rate of change before getting filtered
+     */
     public RateLimitFilter(double limit) {
         this.m_a = limit;
     }
 
+    /**
+     * Update the filter with data
+     * @param data a new sample to filter
+     */
     public void update(double data) {
         prevData = currData;
         currData = data;
@@ -31,10 +40,17 @@ public class RateLimitFilter {
         }
     }
 
+    /**
+     * Get the value of the filter
+     * @return 
+     */
     public double get() {
         return out;
     }
 
+    /**
+     * Zeros the filter output
+     */
     public void reset() {
         out = 0;
     }

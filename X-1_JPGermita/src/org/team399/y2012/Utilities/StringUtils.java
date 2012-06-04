@@ -7,15 +7,20 @@ package org.team399.y2012.Utilities;
 import java.util.Vector;
 
 /**
- *
+ * Class of string utilities
  * @author Jeremy
  */
 public class StringUtils {
 
+    /**
+     * Splits a string
+     * @param input Input string to split
+     * @param regex character to split at
+     * @return an array of strings resulting from the split at regex
+     */
     public static String[] split(String input, String regex) {
         Vector nodes = new Vector();
         String separator = regex;
-        System.out.println("split start...................");
         // Parse nodes into vector
         int index = input.indexOf(separator);
         while (index >= 0) {
@@ -38,7 +43,12 @@ public class StringUtils {
 
         return result;
     }
-    
+
+    /**
+     * Returns a string as a double
+     * @param in input string to parse as a double
+     * @return the parsed double
+     */
     public static double toDouble(String in) {
         return Double.parseDouble(in);
     }

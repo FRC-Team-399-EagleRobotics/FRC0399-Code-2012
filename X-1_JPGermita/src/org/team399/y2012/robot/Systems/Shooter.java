@@ -5,6 +5,7 @@
 package org.team399.y2012.robot.Systems;
 
 import edu.wpi.first.wpilibj.CANJaguar;
+import edu.wpi.first.wpilibj.Solenoid;
 import org.team399.y2012.robot.Config.RobotIOMap;
 
 /**
@@ -16,6 +17,7 @@ public class Shooter {
 
     private CANJaguar m_shooterA = null;
     private CANJaguar m_shooterB = null;
+    private Solenoid m_hood = null;
 
     /**
      * Constructor
@@ -49,6 +51,7 @@ public class Shooter {
             System.err.println("[SHOOTER-B]Error initializing");
             e.printStackTrace();
         }
+        m_hood = new Solenoid(RobotIOMap.HOOD_PORT);
     }
     private double vel = 0;
     private final double a = 0.5;
@@ -94,8 +97,8 @@ public class Shooter {
         prevPrevErr = prevErr;
         prevErr = err;
         err = setPointV - getEncoderRate();
-        
-        if(setPointV < 200) {   //Set some deadband on velocity control
+
+        if (setPointV < 200) {   //Set some deadband on velocity control
             out = 0;            //If commanded a very low speed, coast to a stop
         } else {
             out += -.000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);
@@ -107,18 +110,22 @@ public class Shooter {
         if (out < -1) {
             out = -1;
         }
-        
+
         shoot();
     }
-    
-    public void shoot() {
-        if(enabled) {
+
+    private void shoot() {
+        if (enabled) {
             setWheelVoltage(out);
         } else {
             setWheelVoltage(0);
         }
     }
-    
+
+    /**
+     * returns true if the shooter is within 100 rpm of the target speed
+     * @return 
+     */
     public boolean isAtTargetSpeed() {
         return (err < 100) && !(setPointV != 0);
     }
@@ -135,9 +142,12 @@ public class Shooter {
             e.printStackTrace();
         }
     }
-    
     private boolean enabled = true;
-    
+
+    /**
+     * Enable the shooter 
+     * @param enabled 
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
@@ -147,6 +157,6 @@ public class Shooter {
      * @param state true for up, false for down.
      */
     public void setHood(boolean state) {
-        //Do hood stuff here
+        m_hood.set(state);
     }
 }

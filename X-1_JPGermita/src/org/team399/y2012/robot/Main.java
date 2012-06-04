@@ -7,6 +7,8 @@
 package org.team399.y2012.robot;
 
 import edu.wpi.first.wpilibj.*;
+import org.team399.y2012.robot.Controls.Autonomous.AutonFile;
+import org.team399.y2012.robot.Controls.Autonomous.AutonInterpreter;
 
 /**
  * This is the main class. It provides the periodic and continuous methods for processing
@@ -16,7 +18,9 @@ import edu.wpi.first.wpilibj.*;
 public class Main extends IterativeRobot {
 
     public static Robot bot;
-    
+    AutonFile auton;
+    AutonInterpreter ai;
+
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -25,11 +29,17 @@ public class Main extends IterativeRobot {
         bot = new Robot();
     }
 
+    public void autonomousInit() {
+        auton = new AutonFile("Autonomous.txt");
+        ai = new AutonInterpreter(auton.getParsedFile());
+    }
+
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
         bot.run();
+        ai.run();
     }
 
     /**
@@ -38,31 +48,29 @@ public class Main extends IterativeRobot {
     public void teleopPeriodic() {
         bot.run();
     }
-    
+
     public void drive() {
-        double leftPower = 0,       //Variables to customize controls easily
-               rightPower = 0;
+        double leftPower = 0, //Variables to customize controls easily
+                rightPower = 0;
         boolean shift = false,
                 intake = false;
-        
+
         bot.drive.tankDrive(leftPower, rightPower);
-        
-        if(shift) {
+
+        if (shift) {
             bot.drive.highGear();
         } else {
             bot.drive.lowGear();
         }
-        
+
         bot.intake.setDropper(intake);
     }
-    
+
     public void operate() {
         double shooterSpeed = 0,
-               intakeSpeed = 0,
-               turretAngle = 0;
-        boolean intakeUp = false,
-                intakeDown = false,
-                hood = false,
+                intakeSpeed = 0,
+                turretAngle = 0;
+        boolean hood = false,
                 shoot = false;
         boolean autoShoot = false,
                 autoSpeed = false,
@@ -70,25 +78,20 @@ public class Main extends IterativeRobot {
                 autoAimLFend = false,
                 autoAimRFend = false,
                 autoAimKey = false;
-        
+
         boolean manualAim = !(autoAimLock || autoAimLFend || autoAimRFend || autoAimKey);
-        
-        if(manualAim) { //If manual aiming is used
-            
-        } else if(autoAimLock) {
-            
-        } else if(autoAimLFend) {
-            
-        } else if(autoAimRFend) {
-            
-        } else if(autoAimKey) {
-            
+
+        if (manualAim) { //If manual aiming is used
+        } else if (autoAimLock) {
+        } else if (autoAimLFend) {
+        } else if (autoAimRFend) {
+        } else if (autoAimKey) {
         }
-        
-        if(shoot) {
+
+        if (shoot) {
             bot.shooter.setVelocity(shooterSpeed);
-        } else if(autoShoot){
-            if(!autoSpeed) {
+        } else if (autoShoot) {
+            if (!autoSpeed) {
                 bot.shootController.shoot(shooterSpeed, intakeSpeed);
             } else {
                 bot.shootController.shootDist(bot.eye.getTallestTarget().distance, intakeSpeed);
@@ -96,6 +99,6 @@ public class Main extends IterativeRobot {
         } else {
             bot.shooter.setVelocity(shooterSpeed);
         }
-        
+
     }
 }

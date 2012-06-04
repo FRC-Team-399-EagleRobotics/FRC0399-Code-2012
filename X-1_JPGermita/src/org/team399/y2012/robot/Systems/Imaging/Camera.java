@@ -4,10 +4,8 @@
  */
 package org.team399.y2012.robot.Systems.Imaging;
 
-//import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.camera.AxisCamera;
 import edu.wpi.first.wpilibj.image.ColorImage;
-//import org.team399.y2012.config.RobotIOMap;
 
 /**
  * Camera Class. encapsulates camera and tilt servo code.
@@ -16,10 +14,11 @@ import edu.wpi.first.wpilibj.image.ColorImage;
 public class Camera {
 
     private AxisCamera camera = null;
-    //private Servo tilt = null;
 
+    /**
+     * Constructor
+     */
     public Camera() {
-        //  tilt = new Servo(RobotIOMap.CAM_TILT_SERVO_PWM);
         try {
             camera = AxisCamera.getInstance();
         } catch (Exception e) {
@@ -28,13 +27,18 @@ public class Camera {
         }
     }
 
-    /*public double getTiltAngle() {
-    return tilt.getAngle();
-    }*/
+    /**
+     * Returns true if the camera has a new image
+     * @return 
+     */
     public boolean freshImage() {
         return camera.freshImage();
     }
 
+    /**
+     * Color image, ready for processing
+     * @return 
+     */
     public ColorImage getImage() {
         try {
             return camera.getImage();
@@ -44,7 +48,4 @@ public class Camera {
         }
         return null;
     }
-    /* public void setTiltAngle(double angle) {
-    tilt.setAngle(angle);
-    }*/
 }

@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import org.team399.y2012.robot.Config.RobotIOMap;
 
 /**
- *
+ * Drivetrain class that encapsulates all basic drivetrain functions
  * @author Jeremy
  */
 public class DriveTrain {
@@ -251,7 +251,6 @@ public class DriveTrain {
         double derivative = error - prevError;
         double PID_Out = proportional - D * derivative;
         prevError = error;
-//        System.out.println("Angle: " + getAngle());
         tankDrive((throttle) - PID_Out, (throttle) + PID_Out);
     }
 

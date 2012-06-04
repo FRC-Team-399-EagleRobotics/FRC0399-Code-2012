@@ -10,8 +10,8 @@ import java.io.PrintStream;
 import javax.microedition.io.Connector;
 
 /**
- *
- * @author kspoelstra
+ * Datalogger class. prints data to file
+ * @author Justin S. and Jeremy G.
  */
 public class DataLogger {
 
@@ -28,6 +28,11 @@ public class DataLogger {
         }
     }
 
+    /**
+     * Returns the current instance of the datalogger
+     * @param filename the location of the file to save to
+     * @return The current datalogger instance
+     */
     public static DataLogger getInstance(String filename) {
         if (instance == null) {
             instance = new DataLogger(filename);
@@ -35,6 +40,10 @@ public class DataLogger {
         return instance;
     }
 
+    /**
+     * Prints a string to file
+     * @param s 
+     */
     public void print(String s) {
         if (enabled) {
             out.print(s);
@@ -42,14 +51,14 @@ public class DataLogger {
         }
     }
 
+    /**
+     * Prints a string to file, appends with a newline char
+     * @param s 
+     */
     public void println(String s) {
         if (enabled) {
             out.println(s);
             out.flush();
         }
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 }

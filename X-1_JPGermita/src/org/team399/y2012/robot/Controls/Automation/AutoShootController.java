@@ -20,8 +20,8 @@ public class AutoShootController {
 
     /**
      * Constructor
-     * @param shooter
-     * @param intake 
+     * @param shooter shooter instance to use
+     * @param intake intake instance to use
      */
     public AutoShootController(Shooter shooter, Intake intake, AutoShooterSpeedController assc) {
         this.m_shooter = shooter;
@@ -30,6 +30,11 @@ public class AutoShootController {
     }
     
     
+    /**
+     * Auto shoot routine
+     * @param shooterSpeed RPM to run shooter at
+     * @param beltSpeed belt speed to run intake at
+     */
     public void shoot(double shooterSpeed, double beltSpeed) {
         m_shooter.setVelocity(shooterSpeed);
         
@@ -41,6 +46,11 @@ public class AutoShootController {
         
     }
     
+    /**
+     * Autoshoot with autospeed
+     * @param distance distance to shoot to
+     * @param beltSpeed belt speed to run intake at
+     */
     public void shootDist(double distance, double beltSpeed) {
         shoot(m_assc.distanceToRPM(distance), beltSpeed);
     }

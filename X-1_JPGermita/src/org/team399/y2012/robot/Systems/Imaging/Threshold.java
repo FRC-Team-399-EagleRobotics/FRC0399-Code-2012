@@ -5,8 +5,8 @@
 package org.team399.y2012.robot.Systems.Imaging;
 
 /**
- *
- * @author robotics
+ * an object to represent an HSL threshold
+ * @author Justin S.
  */
 public class Threshold {
 
@@ -17,6 +17,15 @@ public class Threshold {
     public int LumHigh;
     public int LumLow;
 
+    /**
+     * Constructor
+     * @param hueL
+     * @param hueH
+     * @param satL
+     * @param satH
+     * @param lumL
+     * @param lumH 
+     */
     public Threshold(int hueL, int hueH, int satL, int satH, int lumL, int lumH) {
         HueHigh = hueH;
         HueLow = hueL;

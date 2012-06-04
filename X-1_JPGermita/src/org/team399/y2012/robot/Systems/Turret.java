@@ -43,13 +43,17 @@ public class Turret {
     public void setAngle(double angle) {
         try {
             m_turret.setX(angle);// - 3);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    public double getPosition() {
+
+    /**
+     * Get the actual position of the turret
+     * @return 
+     */
+    public double getActualPosition() {
         try {
             return m_turret.getPosition();
         } catch (Exception e) {
@@ -57,8 +61,12 @@ public class Turret {
         }
         return 0;
     }
-    
-    public double getAngle() {
+
+    /**
+     * get the set position
+     * @return 
+     */
+    public double getSetPosition() {
         try {
             return m_turret.getX();
         } catch (Exception e) {
@@ -66,10 +74,12 @@ public class Turret {
         }
         return 0;
     }
-    
+
+    /**
+     * Returns true if the turret is actually very close to the target position
+     * @return 
+     */
     public boolean isAtAngle() {
-        return Math.abs(getAngle() - getPosition()) < .00005;
+        return Math.abs(getSetPosition() - getActualPosition()) < .00005;
     }
-    
-    
 }

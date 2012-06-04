@@ -5,13 +5,19 @@
 package org.team399.y2012.robot.Systems.Imaging;
 
 /**
- *
+ * A class representing a color in RGB, HSL, or HSI
  * @author robotics
  */
 public class Color {
 
     private double red, green, blue;
 
+    /**
+     * Constructor
+     * @param R 
+     * @param G
+     * @param B 
+     */
     public Color(double R, double G, double B) {
         red = R;
         green = G;
@@ -54,6 +60,12 @@ public class Color {
         this.blue = c.blue;
     }
 
+    /**
+     * Sets the color in the HSL colorspace
+     * @param hue
+     * @param sat
+     * @param lum 
+     */
     public void setHSL(double hue, double sat, double lum) {
         hue = fMod(hue, 360.0);
 
@@ -104,6 +116,12 @@ public class Color {
         blue += m;
     }
 
+    /**
+     * Sets a color in the HSV colorspace
+     * @param hue
+     * @param sat
+     * @param val 
+     */
     public void setHSV(double hue, double sat, double val) {
         hue = fMod(hue, 360.0);
 
@@ -149,6 +167,12 @@ public class Color {
         }
     }
 
+    /**
+     * Floating point modulus 
+     * @param input
+     * @param mod
+     * @return 
+     */
     private static double fMod(double input, double mod) {
         double output = input / mod;
         output -= (int) output;
