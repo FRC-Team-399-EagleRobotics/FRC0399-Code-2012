@@ -47,8 +47,8 @@ public class AutoShootController {
     }
     
     /**
-     * Autoshoot with autospeed
-     * @param distance distance to shoot to
+     * Autoshoot with autospeed. automagically :P
+     * @param distance distance to shoot to in inches
      * @param beltSpeed belt speed to run intake at
      */
     public void shootDist(double distance, double beltSpeed) {

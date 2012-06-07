@@ -5,6 +5,7 @@
 package org.team399.y2012.robot;
 
 import org.team399.y2012.Utilities.PrintStream;
+import org.team399.y2012.robot.Controls.Automation.AutoAimController;
 import org.team399.y2012.robot.Controls.Automation.AutoShootController;
 import org.team399.y2012.robot.Controls.Automation.AutoShooterSpeedController;
 import org.team399.y2012.robot.Systems.*;
@@ -24,6 +25,7 @@ public class Robot {
     private PrintStream ps_bot = new PrintStream("[ROBOT] ");   //Printstream for deubgging
     public AutoShootController shootController;
     public AutoShooterSpeedController shooterSpeedController;
+    public AutoAimController aic;
 
     /**
      * Constructor. Insert any other initialization commands here
@@ -36,7 +38,7 @@ public class Robot {
         intake = new Intake();        //Intake instantiation
         turret = new Turret();        //Turret instantiation
         eye = new EagleEye();         //Eagle Eye Instantiation
-        ps_bot.println("Systems Intantiated");
+        ps_bot.println("Systems Initialized");
         shooterSpeedController = new AutoShooterSpeedController();
         shootController = new AutoShootController(shooter, intake, shooterSpeedController);
 
@@ -48,6 +50,6 @@ public class Robot {
      * will be common between autonomous and teleoperated modes. 
      */
     public void run() {
-        shooter.update(5, 4, 3, .2);    //Update shooter PID controller
+        shooter.update();
     }
 }

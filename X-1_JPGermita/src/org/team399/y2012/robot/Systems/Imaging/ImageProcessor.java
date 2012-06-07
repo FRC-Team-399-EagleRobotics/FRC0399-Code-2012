@@ -109,11 +109,33 @@ public class ImageProcessor {
      */
     public static class Target {
 
+        /**
+         * The target's X axis value in the image
+         */
         public int x;
+        /**
+         * The target's Y axis value in the image
+         */
         public int y;
+        
+        /**
+         * The target's width
+         */
         public int width;
+        
+        /**
+         * The target's height
+         */
         public int height;
+        
+        /**
+         * The target's calculated straight line distance from the camera lens
+         */
         public double distance;
+        
+        /**
+         * The target's area in the image
+         */
         public double area;
 
         /**

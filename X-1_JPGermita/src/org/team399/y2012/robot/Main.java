@@ -46,9 +46,14 @@ public class Main extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-        bot.run();
+        bot.run();  //Basic robot functions that run continuously
+        drive();    //Driver routine
+        operate();  //operator routine
     }
 
+    /**
+     * Driver's routine. Edit driver controls here
+     */
     public void drive() {
         double leftPower = 0, //Variables to customize controls easily
                 rightPower = 0;
@@ -66,6 +71,9 @@ public class Main extends IterativeRobot {
         bot.intake.setDropper(intake);
     }
 
+    /**
+     * Operator routine. edit operator controls here
+     */
     public void operate() {
         double shooterSpeed = 0,
                 intakeSpeed = 0,
@@ -82,7 +90,10 @@ public class Main extends IterativeRobot {
         boolean manualAim = !(autoAimLock || autoAimLFend || autoAimRFend || autoAimKey);
 
         if (manualAim) { //If manual aiming is used
+            //Todo: rethink implementation here. If momentary buttons are used, turret will snap back to the manual position after manual
+            //Essentially, only switch back to manual if operator explicitly commands a transition into manual
         } else if (autoAimLock) {
+            
         } else if (autoAimLFend) {
         } else if (autoAimRFend) {
         } else if (autoAimKey) {

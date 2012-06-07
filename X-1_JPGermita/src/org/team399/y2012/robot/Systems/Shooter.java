@@ -18,6 +18,15 @@ public class Shooter {
     private CANJaguar m_shooterA = null;
     private CANJaguar m_shooterB = null;
     private Solenoid m_hood = null;
+    
+    /*************************************
+     * SHOOTER PID CONSTANTS ARE HERE:
+     * ***********************************
+     */
+    private double kP = 5, //Velocity PID Proportional gain
+                   kI = 4, //V-PID Integral gain
+                   kD = 3, //V-PID differential gain
+                   kF = .2;//V-PID feed forward gain
 
     /**
      * Constructor
@@ -25,6 +34,7 @@ public class Shooter {
      * @param HOOD_CAN_ID CAN ID for hood
      */
     public Shooter() {
+        
         try {
 
             //Encoder enabled shooter jag setup: MUST FOLLOW THIS SEQUENCE OR ENCODER OR MOTOR WILL NOT WORK
@@ -87,6 +97,13 @@ public class Shooter {
     double out = 0;
 
     /**
+     * Updates the PID controller using preconfigured values.
+     */
+    public void update() {
+        update(kP, kI, kD, kF);    //Update shooter PID controller
+    }
+    
+    /**
      * Speed control algorithm
      * @param P Proportional scalar value.
      * @param I Integral scalar value
@@ -101,10 +118,10 @@ public class Shooter {
         if (setPointV < 200) {   //Set some deadband on velocity control
             out = 0;            //If commanded a very low speed, coast to a stop
         } else {
-            out += -.000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);
+            out += -.000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);  //PID + feedforward calculation
         }
 
-        if (out > 1) {
+        if (out > 1) {  //Clamping the output to +- 1
             out = 1;
         }
         if (out < -1) {

@@ -41,7 +41,7 @@ public class AutoDriveTrain {
     }
     
     /**
-     * Drive to a distance
+     * Drive to a distance in inches
      * @param distance distance in inches
      */
     public void driveToDistance(double distance) {

@@ -34,8 +34,8 @@ public class AutoAimController {
         //DO WORK HERE
         if (System.currentTimeMillis() % 100 < 5) {      //Put on a .1 second timer to reduce noise in tracking
             if (m_turret.isAtAngle() && m_eye.foundTarget()) {    //Check to see if turret is still trying to go to a set position
-                double targetDistance = m_eye.getTallestTarget().distance;
-                double xErr = 240 - m_eye.getTallestTarget().x;
+                double targetDistance = m_eye.getTallestTarget().distance;  //Get distance in inches
+                double xErr = 240 - m_eye.getTallestTarget().x;             //Target's distance from the center of view
 
                 double angle = MathUtils.asin(xErr / targetDistance);
                 m_turret.setAngle(m_turret.getSetPosition()-angle);

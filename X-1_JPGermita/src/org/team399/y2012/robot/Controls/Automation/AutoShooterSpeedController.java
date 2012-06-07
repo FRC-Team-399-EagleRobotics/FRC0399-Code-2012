@@ -24,13 +24,6 @@ public class AutoShooterSpeedController {
      * @return an RPM for the shooter
      */
     public static double distanceToRPM(double distance) {
-//        return distance;
-
-        /*double answer = MathUtils.pow(distance-3000, 3);
-        answer *= .000000003;
-        answer += 60;
-        return answer;*/
-
 
         double midRange = 60;
         double maxRange = 120;
