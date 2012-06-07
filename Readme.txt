@@ -15,6 +15,20 @@ ________________________________________________________________________________
   -Initial Configuration of robot components
 
 
+Highlights of new features:
+__________________________________________________________________________________________________________________________________
+  -Text file scripted autonomous - Just drop a special text file onto the cRIO and autonomous will follow the instructions in that file
+
+  -Brand new image tracking algorithm - Uses a single image and some trigonometry to determine the position of the target and where to turn the turret
+
+  -Simplified structure of the program
+
+  -Various controllers for automating tasks as aiming, shooting, and balancing. The auto shoot controller makes shots more reliable as it disables the ability to shoot until the shooter is at target speed
+
+  -Much more
+
+
+
 
 Other files included in this project:
 __________________________________________________________________________________________________________________________________
