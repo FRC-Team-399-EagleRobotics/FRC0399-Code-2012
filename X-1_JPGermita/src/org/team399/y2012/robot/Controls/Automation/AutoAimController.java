@@ -71,13 +71,23 @@ public class AutoAimController {
         setAndLock(0);
     }
 
+    /**
+     * changes the turret angle as a function of the robot drivetrain's angle, attempting to keep the turret angle
+     * constantly pointed in a direction
+     * @param angle The robot drivetrain's angle
+     */
+    public void virtualFourBar(double angle)  {
+        double setAngle = (angle - 90)/360;    //Some fancy scaling math to get the drivetrain angle to be  a usable angle for the turret
+        setAndLock(angle);
+    }
     
     private void setAndLock(double angle) {
-
         if (m_turret.isAtAngle() && Math.abs(m_turret.getSetPosition() - angle) > .5) {
             lockOn();
         } else {
             m_turret.setAngle(angle);
         }
     }
+    
+   
 }

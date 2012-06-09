@@ -9,6 +9,10 @@ package org.team399.y2012.robot;
 import edu.wpi.first.wpilibj.*;
 import org.team399.y2012.robot.Controls.Autonomous.AutonFile;
 import org.team399.y2012.robot.Controls.Autonomous.AutonInterpreter;
+import edu.wpi.first.wpilibj.Joystick;
+import org.team399.y2012.Utilities.EagleMath;
+import org.team399.y2012.robot.Controls.HumanInterfaceDevices.DriverStationUserInterface;
+import edu.wpi.first.wpilibj.Compressor;
 
 /**
  * This is the main class. It provides the periodic and continuous methods for processing
@@ -20,6 +24,10 @@ public class Main extends IterativeRobot {
     public static Robot bot;
     AutonFile auton;
     AutonInterpreter ai;
+    Compressor comp = new Compressor(4, 1);
+    Joystick leftJoy = new Joystick(1);
+    Joystick rightJoy = new Joystick(2);
+    DriverStationUserInterface funbox = new DriverStationUserInterface();
 
     /**
      * This function is run when the robot is first started up and should be
@@ -27,6 +35,12 @@ public class Main extends IterativeRobot {
      */
     public void robotInit() {
         bot = new Robot();
+        comp.start();
+        bot.shooter.setEnabled(true);
+    }
+    
+    public void disabledPeriodic() {
+        bot.eye.demoMode();
     }
 
     public void autonomousInit() {
@@ -40,6 +54,7 @@ public class Main extends IterativeRobot {
     public void autonomousPeriodic() {
         bot.run();
         ai.run();
+
     }
 
     /**
@@ -55,10 +70,10 @@ public class Main extends IterativeRobot {
      * Driver's routine. Edit driver controls here
      */
     public void drive() {
-        double leftPower = 0, //Variables to customize controls easily
-                rightPower = 0;
-        boolean shift = false,
-                intake = false;
+        double leftPower = leftJoy.getRawAxis(2), //Variables to customize controls easily
+                rightPower = -rightJoy.getRawAxis(2);
+        boolean shift = rightJoy.getRawButton(1),
+                intake = leftJoy.getRawButton(1);
 
         bot.drive.tankDrive(leftPower, rightPower);
 
@@ -75,41 +90,66 @@ public class Main extends IterativeRobot {
      * Operator routine. edit operator controls here
      */
     public void operate() {
-        double shooterSpeed = 0,
-                intakeSpeed = 0,
-                turretAngle = 0;
-        boolean hood = false,
-                shoot = false;
-        boolean autoShoot = false,
+
+        boolean autoShoot = rightJoy.getRawButton(6),//funbox.getShooterSwitch().equals("AUTO")
+                //&& funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON),
                 autoSpeed = false,
                 autoAimLock = false,
                 autoAimLFend = false,
                 autoAimRFend = false,
                 autoAimKey = false;
 
-        boolean manualAim = !(autoAimLock || autoAimLFend || autoAimRFend || autoAimKey);
+        double shooterSpeed = EagleMath.map((float)funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB), 
+                                            (float)0, (float)4.0, (float)1000, (float)5500),
+                intakeSpeed = funbox.getAnalog(DriverStationUserInterface.PORTS.BELT_KNOB),
+                turretAngle = 0;
+        boolean hood = (funbox.getHoodSwitch().equals("AUTO") || funbox.getHoodSwitch().equals("MANUAL")),
+                shoot = funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON) && !autoShoot;
 
-        if (manualAim) { //If manual aiming is used
-            //Todo: rethink implementation here. If momentary buttons are used, turret will snap back to the manual position after manual
-            //Essentially, only switch back to manual if operator explicitly commands a transition into manual
+        boolean manualAim = funbox.getTurretSwitch().equals("MANUAL");
+        
+
+//        if (!(autoAimLock || autoAimLFend || autoAimRFend || autoAimKey)) {
+//            manualAim = false;
+//        } else if (funbox.getTurretSwitch().equals("MANUAL")) {
+//            manualAim = true;
+//        }
+
+        if (manualAim) {
+            bot.turret.setAngle(EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 1.7, (float) 5.0, (float) 9.6, (float) 2.25));//TODO: scale to range
         } else if (autoAimLock) {
-            
+            bot.aic.lockOn();
         } else if (autoAimLFend) {
+            bot.aic.leftFender();
         } else if (autoAimRFend) {
+            bot.aic.rightFender();
         } else if (autoAimKey) {
+            bot.aic.virtualFourBar(bot.drive.getAngleWraparound());
         }
 
         if (shoot) {
             bot.shooter.setVelocity(shooterSpeed);
         } else if (autoShoot) {
             if (!autoSpeed) {
-                bot.shootController.shoot(shooterSpeed, intakeSpeed);
+                bot.shootController.shoot(shooterSpeed, 1);
             } else {
-                bot.shootController.shootDist(bot.eye.getTallestTarget().distance, intakeSpeed);
+                bot.shootController.shootDist(bot.eye.getTallestTarget().distance, 1);
             }
         } else {
-            bot.shooter.setVelocity(shooterSpeed);
+            bot.shooter.setVelocity(0);
+
+            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON)) {
+                bot.intake.setIntake(1.0);
+            } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON)) {
+                bot.intake.setIntake(-1.0);
+            } else {
+                bot.intake.setIntake(0);
+            }
         }
+
+
+        bot.shooter.setHood(hood);
+
 
     }
 }

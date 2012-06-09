@@ -20,14 +20,13 @@ public class Turret {
      * @param CAN_ID Motor's CAN ID
      */
     public Turret() {
-
         try {
             m_turret = new CANJaguar(RobotIOMap.TURRET_ID);
             m_turret.changeControlMode(CANJaguar.ControlMode.kPosition);
             m_turret.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
             m_turret.configPotentiometerTurns(10);
-            m_turret.configSoftPositionLimits(1.0, 8.5);                                            //TURRET LIMITS
-            m_turret.setPID(-50, -.1, 35);                                                          //TURRET PID CONSTANTS
+            m_turret.configSoftPositionLimits(2.25, 9.6);                                            //TURRET LIMITS
+            m_turret.setPID(-200, 0, 200);                                                          //TURRET PID CONSTANTS
             m_turret.configNeutralMode(CANJaguar.NeutralMode.kBrake);
             m_turret.enableControl();
         } catch (Exception e) {
@@ -37,8 +36,8 @@ public class Turret {
     }
 
     /**
-     * Set the angle of the turret, relative to the right side of the robto
-     * @param angle 
+     * Set the angle of the turret, relative to the right side of the robot
+     * @param angle in degrees
      */
     public void setAngle(double angle) {
         try {

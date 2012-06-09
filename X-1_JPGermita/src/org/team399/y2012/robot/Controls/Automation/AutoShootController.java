@@ -36,18 +36,26 @@ public class AutoShootController {
      * @param beltSpeed belt speed to run intake at
      */
     public void shoot(double shooterSpeed, double beltSpeed) {
+        System.out.println("Autoshooting...");
         m_shooter.setVelocity(shooterSpeed);
         
-        if((m_intake.hasBall() && m_shooter.isAtTargetSpeed())) {
+        beltSpeed *= -1;
+        
+        if(m_shooter.isAtTargetSpeed()) {
             m_intake.setIntake(beltSpeed);
         } else {
-            m_intake.setIntake(0);
+            if(m_intake.hasBall()) {
+                m_intake.setIntake(beltSpeed);
+            } else {
+                m_intake.setIntake(0);
+            }
+                
         }
         
     }
     
     /**
-     * Autoshoot with autospeed. automagically :P
+     * Autoshoot with autospeed. 
      * @param distance distance to shoot to in inches
      * @param beltSpeed belt speed to run intake at
      */

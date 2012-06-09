@@ -23,9 +23,9 @@ public class Shooter {
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
      */
-    private double kP = 5, //Velocity PID Proportional gain
+    private double kP = 4, //Velocity PID Proportional gain
                    kI = 4, //V-PID Integral gain
-                   kD = 3, //V-PID differential gain
+                   kD = 5, //V-PID differential gain
                    kF = .2;//V-PID feed forward gain
 
     /**
@@ -44,7 +44,7 @@ public class Shooter {
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);//Change mode to percent vbus
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPosition);//Change mode to position mode
             m_shooterA.setPositionReference(CANJaguar.PositionReference.kQuadEncoder);//Change position reference to encoder
-            m_shooterA.configEncoderCodesPerRev(250);                   //set Encoder type
+            m_shooterA.configEncoderCodesPerRev(360);                   //set Encoder type
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);//Back to percent vbus mode
             m_shooterA.configFaultTime(.5);                             //Half second fault time to minimize down time in case of fault
         } catch (Exception e) {
@@ -68,7 +68,7 @@ public class Shooter {
     private double prevT = System.currentTimeMillis();
 
     public double getEncoderRate() {
-        double scalar = -85423.972664328747414800827263735; //-542.63565891472*3.0;
+        double scalar = -((85423.972664328747414800827263735)/250)*360; //-542.63565891472*3.0;//-
         try {
             prevPos = pos;
             pos = m_shooterA.getPosition();
@@ -121,12 +121,18 @@ public class Shooter {
             out += -.000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);  //PID + feedforward calculation
         }
 
+        out = Math.abs(out);
+        
         if (out > 1) {  //Clamping the output to +- 1
             out = 1;
         }
-        if (out < -1) {
-            out = -1;
-        }
+        
+        System.out.println("Veloc: " + getEncoderRate());
+        System.out.println("SETV : " + setPointV);
+        System.out.println("Error: " + err);
+        
+        
+        out *= -1;
 
         shoot();
     }
@@ -144,7 +150,9 @@ public class Shooter {
      * @return 
      */
     public boolean isAtTargetSpeed() {
-        return (err < 100) && !(setPointV != 0);
+        System.out.println("Veloc: " + getEncoderRate());
+        System.out.println("Error: " + err);
+        return (err < 100);// && !(setPointV != 0);
     }
 
     /**
@@ -153,11 +161,12 @@ public class Shooter {
      */
     private void setWheelVoltage(double voltage) {
         try {
-            m_shooterA.setX(-voltage, RobotIOMap.SHOOTER_SYNC_ID);
-            m_shooterB.setX(voltage, RobotIOMap.SHOOTER_SYNC_ID);
+            m_shooterA.setX(-voltage);//, RobotIOMap.SHOOTER_SYNC_ID);
+            m_shooterB.setX(voltage);//, RobotIOMap.SHOOTER_SYNC_ID);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
     }
     private boolean enabled = true;
 

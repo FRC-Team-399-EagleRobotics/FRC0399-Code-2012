@@ -41,7 +41,7 @@ public class Robot {
         ps_bot.println("Systems Initialized");
         shooterSpeedController = new AutoShooterSpeedController();
         shootController = new AutoShootController(shooter, intake, shooterSpeedController);
-
+        aic = new AutoAimController(turret, eye);
         ps_bot.println("Initialization complete");
     }
 

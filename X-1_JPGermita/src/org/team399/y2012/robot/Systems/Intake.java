@@ -17,7 +17,7 @@ public class Intake {
     LinearVictor m_intake;      //Linearized victor speed controller for intake motor
     AnalogChannel m_ballSensor; //Analog channel for VEX line sensor
     Solenoid m_dropper;         //Solenoid for bridge mechanism
-    private final double hasBallThresh = 0.0;   //Threshold
+    private final double hasBallThresh = .5;   //Threshold
     //TODO: Tweak this value for real ball
 
     /**
