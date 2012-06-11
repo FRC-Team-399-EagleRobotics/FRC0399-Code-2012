@@ -4,6 +4,8 @@
  */
 package org.team399.y2012.Utilities.Filters;
 
+import org.team399.y2012.Utilities.EagleMath;
+
 /**
  * Rate Limit Filter
  * Filters output by rate of change of input
@@ -34,7 +36,7 @@ public class RateLimitFilter {
         currData = data;
 
         if (Math.abs((prevData - currData)) > m_a) {
-            out += m_a;
+            out += m_a * EagleMath.signum((prevData - currData));
         } else {
             out += data;
         }

@@ -7,6 +7,7 @@ package org.team399.y2012.robot.Systems;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
+import org.team399.y2012.Utilities.Filters.RateLimitFilter;
 import org.team399.y2012.robot.Config.RobotIOMap;
 
 /**
@@ -22,6 +23,8 @@ public class DriveTrain {
     private Solenoid shifter = null;
     private Gyro yaw = new Gyro(RobotIOMap.GYRO_YAW);
     private Gyro pitch = new Gyro(RobotIOMap.GYRO_PITCH);
+    private RateLimitFilter m_pitchFilter = new RateLimitFilter(.1);    //Rate limit filters to help filter out noise
+    private RateLimitFilter m_yawFilter = new RateLimitFilter(.1);      //from gyro readings
 
     /**
      * Constructor
@@ -109,6 +112,35 @@ public class DriveTrain {
     }
 
     /**
+     * Set drivetrain to coast
+     * Used a combination of brake/coast to maintain handling ability
+     */
+    public void coast() {
+        try {
+            m_leftA.configNeutralMode(CANJaguar.NeutralMode.kCoast);
+            m_leftB.configNeutralMode(CANJaguar.NeutralMode.kBrake);
+            m_rightA.configNeutralMode(CANJaguar.NeutralMode.kCoast);
+            m_rightB.configNeutralMode(CANJaguar.NeutralMode.kBrake);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Set drivetrain to brake
+     */
+    public void brake() {
+        try {
+            m_leftA.configNeutralMode(CANJaguar.NeutralMode.kBrake);
+            m_leftB.configNeutralMode(CANJaguar.NeutralMode.kBrake);
+            m_rightA.configNeutralMode(CANJaguar.NeutralMode.kBrake);
+            m_rightB.configNeutralMode(CANJaguar.NeutralMode.kBrake);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Shift gears
      * @param gear True for low gear, false for high 
      */
@@ -136,7 +168,7 @@ public class DriveTrain {
         } else {
             tSens = NORMAL_MODE_TSENS;
         }
-        
+
         double angular_power = 0.0;
         double overPower = 0.0;
         double sensitivity = tSens;
@@ -171,6 +203,30 @@ public class DriveTrain {
         }
 
         tankDrive(lPower, -rPower);
+    }
+
+    /**
+     * Drive algorithm written by Jeremy. Adjusts turning sensitivity with throttle.
+     * Dynamic brake/coasting based on gear
+     * @param left left joystick input
+     * @param right right joystick input
+     * @param gear shifting input, hold for high gear
+     */
+    public void eagleDrive(double left, double right, boolean gear) {
+        double throttle = twoStickToThrottle(left, right);	//convert two stick commands to arcade throttle
+        double turning = twoStickToTurning(left, right);	//convert two stick commands to arcade turning
+
+        double e_tSens = .5;								//scalar value for turning desensitivity
+        double tLim = (1 - Math.abs(throttle)) * e_tSens;	//Turn limiting scalar, based on throttle
+
+        if (!gear) {			//High gear
+            turning *= tLim;	//Apply turn scaling if in high gear
+            coast();	//Put drivetrain into coast for high gear
+        } else {			//Low gear
+            brake();  //Put drivetrain into brake for low gear
+        }
+
+        tankDrive((throttle + turning), -(throttle - turning));	//Output
     }
 
     /**
@@ -224,7 +280,11 @@ public class DriveTrain {
      * @return 
      */
     public double getPitch() {
-        return pitch.getAngle();
+        double pitchVal = pitch.getAngle();
+
+        m_pitchFilter.update(pitchVal);
+
+        return m_pitchFilter.get();
     }
 
     /**
@@ -234,7 +294,6 @@ public class DriveTrain {
         yaw.reset();
         pitch.reset();
     }
-    
     double error = 0;
     double prevError = 0;
 
@@ -254,14 +313,13 @@ public class DriveTrain {
         tankDrive((throttle) - PID_Out, (throttle) + PID_Out);
     }
 
-    
     /**
      * Puts the drivetrain into low gear
      */
     public void lowGear() {
         shifter.set(true);
     }
-    
+
     /**
      * Puts the drivetrain into high gear
      */

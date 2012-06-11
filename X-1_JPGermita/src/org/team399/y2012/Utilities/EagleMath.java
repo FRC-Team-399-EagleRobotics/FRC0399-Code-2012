@@ -33,4 +33,25 @@ public class EagleMath {
     public static boolean isInBand(double input, double low, double high) {
         return input > low && input < high;
     }
+
+    /**
+     * Collapse number down to +1 0 or -1 depending on sign. Typically used in
+     * compare routines to collapse a difference of two longs to an int.
+     * This is much faster than Sun's Long.signum under Java.exe.
+     *
+     * @param diff
+     *        number to be collapsed to an int preserving sign and zeroness.
+     *        usually represents the difference of two long.
+     * @return true signum of diff, +1, 0 or -1.
+     */
+    public static int signum(double diff) {
+        if (diff > 0) {
+            return 1;
+        }
+        if (diff < 0) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
 }
