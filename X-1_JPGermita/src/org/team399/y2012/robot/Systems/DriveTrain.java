@@ -212,7 +212,7 @@ public class DriveTrain {
      * @param right right joystick input
      * @param gear shifting input, hold for high gear
      */
-    public void eagleDrive(double left, double right, boolean gear) {
+    public void iCantBelieveItsNotButterDrive(double left, double right, boolean gear) {
         double throttle = twoStickToThrottle(left, right);	//convert two stick commands to arcade throttle
         double turning = twoStickToTurning(left, right);	//convert two stick commands to arcade turning
 
@@ -221,11 +221,13 @@ public class DriveTrain {
 
         if (!gear) {			//High gear
             turning *= tLim;	//Apply turn scaling if in high gear
+            highGear();
             coast();	//Put drivetrain into coast for high gear
         } else {			//Low gear
+            lowGear();
             brake();  //Put drivetrain into brake for low gear
         }
-
+        
         tankDrive((throttle + turning), -(throttle - turning));	//Output
     }
 

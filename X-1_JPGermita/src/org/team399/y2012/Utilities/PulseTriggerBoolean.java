@@ -6,7 +6,7 @@
 package org.team399.y2012.Utilities;
 
 /**
- *
+ * From FRC125
  * @author NUTRONS_PROGRAMMING
  */
 public class PulseTriggerBoolean {
