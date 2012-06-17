@@ -6,6 +6,7 @@ package org.team399.y2012.robot.Systems;
 
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Solenoid;
+import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 
 /**
@@ -18,15 +19,15 @@ public class Shooter {
     private CANJaguar m_shooterA = null;
     private CANJaguar m_shooterB = null;
     private Solenoid m_hood = null;
-    
+    private PrintStream m_print = new PrintStream("[SHOOTER] ");
     /*************************************
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
      */
     private double kP = 4, //Velocity PID Proportional gain
-                   kI = 4, //V-PID Integral gain
-                   kD = 5, //V-PID differential gain
-                   kF = .2;//V-PID feed forward gain
+            kI = 4, //V-PID Integral gain
+            kD = 5, //V-PID differential gain
+            kF = .2;//V-PID feed forward gain
 
     /**
      * Constructor
@@ -34,7 +35,7 @@ public class Shooter {
      * @param HOOD_CAN_ID CAN ID for hood
      */
     public Shooter() {
-        
+
         try {
 
             //Encoder enabled shooter jag setup: MUST FOLLOW THIS SEQUENCE OR ENCODER OR MOTOR WILL NOT WORK
@@ -68,7 +69,7 @@ public class Shooter {
     private double prevT = System.currentTimeMillis();
 
     public double getEncoderRate() {
-        double scalar = -((85423.972664328747414800827263735)/250)*360; //-542.63565891472*3.0;//-
+        double scalar = -((85423.972664328747414800827263735) / 250) * 360; //-542.63565891472*3.0;//-
         try {
             prevPos = pos;
             pos = m_shooterA.getPosition();
@@ -102,7 +103,7 @@ public class Shooter {
     public void update() {
         update(kP, kI, kD, kF);    //Update shooter PID controller
     }
-    
+
     /**
      * Speed control algorithm
      * @param P Proportional scalar value.
@@ -122,16 +123,16 @@ public class Shooter {
         }
 
         out = Math.abs(out);
-        
+
         if (out > 1) {  //Clamping the output to +- 1
             out = 1;
         }
-        
+
         System.out.println("Veloc: " + getEncoderRate());
         System.out.println("SETV : " + setPointV);
         System.out.println("Error: " + err);
-        
-        
+
+
         out *= -1;
 
         shoot();
@@ -161,12 +162,13 @@ public class Shooter {
      */
     private void setWheelVoltage(double voltage) {
         try {
-            m_shooterA.setX(-voltage);//, RobotIOMap.SHOOTER_SYNC_ID);
-            m_shooterB.setX(voltage);//, RobotIOMap.SHOOTER_SYNC_ID);
+            m_shooterA.setX(-voltage, RobotIOMap.SHOOTER_SYNC_ID);
+            m_shooterB.setX(voltage, RobotIOMap.SHOOTER_SYNC_ID);
+            CANJaguar.updateSyncGroup(RobotIOMap.SHOOTER_SYNC_ID);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
     private boolean enabled = true;
 
@@ -184,5 +186,13 @@ public class Shooter {
      */
     public void setHood(boolean state) {
         m_hood.set(state);
+    }
+
+    public void print() {
+        try {
+            m_print.println("Position: " + m_shooterA.getPosition());
+            m_print.println("Velocity: " + getEncoderRate());
+        } catch (Exception e) {
+        }
     }
 }

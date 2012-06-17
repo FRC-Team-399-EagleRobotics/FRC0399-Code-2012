@@ -1,0 +1,5 @@
+#Test auton for seeing if the auton file parsing works
+DRIVE_POWER, .5, .5, 0
+WAIT, 1000
+DRIVE_POWER, 0, 0, 0
+STOP

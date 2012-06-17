@@ -34,15 +34,24 @@ public class Robot {
         ps_bot.println("Initialization started...");
 
         drive = new DriveTrain();     //Drivetrain Instantiation
+        ps_bot.println("Drivetrain initialized!");
         shooter = new Shooter();      //Shooter instantiation
+        ps_bot.println("Shooter initialized!");
         intake = new Intake();        //Intake instantiation
+        ps_bot.println("Intake initialized!");
         turret = new Turret();        //Turret instantiation
+        ps_bot.println("Turret initialized!");
         eye = new EagleEye();         //Eagle Eye Instantiation
+        ps_bot.println("Vision initialized!");
         ps_bot.println("Systems Initialized");
         shooterSpeedController = new AutoShooterSpeedController();
         shootController = new AutoShootController(shooter, intake, shooterSpeedController);
         aic = new AutoAimController(turret, eye);
+        ps_bot.println("Auto controllers initialized");
+//        ps_bot.println("Excecuting garbage collection...");
+//        System.gc();
         ps_bot.println("Initialization complete");
+        
     }
 
     /**

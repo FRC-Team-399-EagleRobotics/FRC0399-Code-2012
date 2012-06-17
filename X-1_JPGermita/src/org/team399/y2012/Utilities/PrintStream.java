@@ -12,7 +12,9 @@ package org.team399.y2012.Utilities;
 public class PrintStream {
 
     String prefix;
-    String suffix;
+    String suffix = " ";
+    
+    
 
     /**
      * Constructor
@@ -38,6 +40,6 @@ public class PrintStream {
      * @param data 
      */
     public void println(String data) {
-        System.out.println(suffix + data + prefix);
+        System.out.println(prefix + data + suffix);
     }
 }

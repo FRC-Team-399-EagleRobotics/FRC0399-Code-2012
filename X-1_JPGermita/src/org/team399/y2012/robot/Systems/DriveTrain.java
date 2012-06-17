@@ -220,14 +220,14 @@ public class DriveTrain {
         double tLim = (1 - Math.abs(throttle)) * e_tSens;	//Turn limiting scalar, based on throttle
 
         if (!gear) {			//High gear
-            turning *= tLim;	//Apply turn scaling if in high gear
+            turning *= tLim;            //Apply turn scaling if in high gear
             highGear();
-            coast();	//Put drivetrain into coast for high gear
+            coast();                    //Put drivetrain into coast for high gear
         } else {			//Low gear
             lowGear();
-            brake();  //Put drivetrain into brake for low gear
+            brake();                    //Put drivetrain into brake for low gear
         }
-        
+
         tankDrive((throttle + turning), -(throttle - turning));	//Output
     }
 

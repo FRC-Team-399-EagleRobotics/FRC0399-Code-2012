@@ -52,6 +52,7 @@ public class AutonFile {
             System.out.println("Elements Parsed: " + elements[i].length);
         }
         parsedFile = elements;
+        System.gc();
     }
 
     /**
