@@ -25,8 +25,8 @@ public class Turret {
             m_turret.changeControlMode(CANJaguar.ControlMode.kPosition);
             m_turret.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
             m_turret.configPotentiometerTurns(10);
-            m_turret.configSoftPositionLimits(2.25, 9.6);                                            //TURRET LIMITS
-            m_turret.setPID(-200, 0, 200);                                                          //TURRET PID CONSTANTS
+            m_turret.configSoftPositionLimits(1.0, 9.6);                                            //TURRET LIMITS
+            m_turret.setPID(-125, 0, -20);                                                          //TURRET PID CONSTANTS
             m_turret.configNeutralMode(CANJaguar.NeutralMode.kBrake);
             m_turret.enableControl();
         } catch (Exception e) {
@@ -41,7 +41,11 @@ public class Turret {
      */
     public void setAngle(double angle) {
         try {
-            m_turret.setX(angle);// - 3);
+            if (Math.abs(getActualPosition() - angle) < .015) {
+                m_turret.setX(getActualPosition());
+            } else {
+                m_turret.setX(angle);// - 3);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

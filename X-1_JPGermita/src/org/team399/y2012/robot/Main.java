@@ -44,7 +44,7 @@ public class Main extends IterativeRobot {
     }
 
     public void autonomousInit() {
-        auton = new AutonFile("Autonomous.txt");
+        auton = new AutonFile("file:///testAuton.txt");
         ai = new AutonInterpreter(auton.getParsedFile());
     }
 
@@ -64,6 +64,7 @@ public class Main extends IterativeRobot {
         bot.run();  //Basic robot functions that run continuously
         drive();    //Driver routine
         operate();  //operator routine
+        
     }
 
     /**
@@ -71,19 +72,25 @@ public class Main extends IterativeRobot {
      */
     public void drive() {
         double leftPower = leftJoy.getRawAxis(2), //Variables to customize controls easily
-                rightPower = -rightJoy.getRawAxis(2);
-        boolean shift = rightJoy.getRawButton(1),
+                rightPower = -leftJoy.getRawAxis(4);
+        boolean shift = leftJoy.getRawButton(6),
                 intake = leftJoy.getRawButton(1);
 
-        bot.drive.tankDrive(leftPower, rightPower);
-
-        if (shift) {
-            bot.drive.highGear();
+//        bot.drive.tankDrive(leftPower, rightPower);
+//
+//        if (shift) {
+//            bot.drive.highGear();
+//        } else {
+//            bot.drive.lowGear();
+//        }
+//
+//        bot.intake.setDropper(intake);
+        if(!leftJoy.getRawButton(10)) {
+            bot.drive.iCantBelieveItsNotButterDrive(leftPower, -rightPower, shift);
         } else {
+            bot.drive.tankDrive(-.4, .4);
             bot.drive.lowGear();
         }
-
-        bot.intake.setDropper(intake);
     }
 
     /**
@@ -91,7 +98,7 @@ public class Main extends IterativeRobot {
      */
     public void operate() {
 
-        boolean autoShoot = rightJoy.getRawButton(6),//funbox.getShooterSwitch().equals("AUTO")
+        boolean autoShoot = leftJoy.getRawButton(8),//funbox.getShooterSwitch().equals("AUTO")
                 //&& funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON),
                 autoSpeed = false,
                 autoAimLock = false,
@@ -99,8 +106,10 @@ public class Main extends IterativeRobot {
                 autoAimRFend = false,
                 autoAimKey = false;
 
-        double shooterSpeed = EagleMath.map((float)funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB), 
-                                            (float)0, (float)4.0, (float)1000, (float)5500),
+        double shooterSpeed = //4000
+                EagleMath.map((float)funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB), 
+                                           (float)1.5, (float)3.3, (float)500, (float)3500)
+                ,
                 intakeSpeed = funbox.getAnalog(DriverStationUserInterface.PORTS.BELT_KNOB),
                 turretAngle = 0;
         boolean hood = (funbox.getHoodSwitch().equals("AUTO") || funbox.getHoodSwitch().equals("MANUAL")),
@@ -116,11 +125,12 @@ public class Main extends IterativeRobot {
 //        }
 
         if (manualAim) {
-            bot.turret.setAngle(EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 1.7, (float) 5.0, (float) 9.6, (float) 2.25));//TODO: scale to range
+            bot.turret.setAngle(EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 3.3, (float) 2.2, (float) 9.6, (float) 1.6));//TODO: scale to range
         } else if (autoAimLock) {
             bot.aic.lockOn();
         } else if (autoAimLFend) {
             bot.aic.leftFender();
+            
         } else if (autoAimRFend) {
             bot.aic.rightFender();
         } else if (autoAimKey) {
@@ -129,6 +139,14 @@ public class Main extends IterativeRobot {
 
         if (shoot) {
             bot.shooter.setVelocity(shooterSpeed);
+            
+            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON)) {
+                bot.intake.setIntake(1.0);
+            } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON)) {
+                bot.intake.setIntake(-1.0);
+            } else {
+                bot.intake.setIntake(0);
+            }
         } else if (autoShoot) {
             if (!autoSpeed) {
                 bot.shootController.shoot(shooterSpeed, 1);

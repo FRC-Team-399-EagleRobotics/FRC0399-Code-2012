@@ -7,7 +7,7 @@ package org.team399.y2012.robot.Systems;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
-import org.team399.y2012.Utilities.Filters.RateLimitFilter;
+import org.team399.y2012.Utilities.RateLimitFilter;
 import org.team399.y2012.robot.Config.RobotIOMap;
 
 /**
@@ -216,7 +216,7 @@ public class DriveTrain {
         double throttle = twoStickToThrottle(left, right);	//convert two stick commands to arcade throttle
         double turning = twoStickToTurning(left, right);	//convert two stick commands to arcade turning
 
-        double e_tSens = .5;								//scalar value for turning desensitivity
+        double e_tSens = .65;								//scalar value for turning desensitivity
         double tLim = (1 - Math.abs(throttle)) * e_tSens;	//Turn limiting scalar, based on throttle
 
         if (!gear) {			//High gear

@@ -24,10 +24,10 @@ public class Shooter {
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
      */
-    private double kP = 4, //Velocity PID Proportional gain
-            kI = 4, //V-PID Integral gain
-            kD = 5, //V-PID differential gain
-            kF = .2;//V-PID feed forward gain
+    private double kP = 4,  //Velocity PID Proportional gain
+            kI = 4,         //V-PID Integral gain
+            kD = 5,         //V-PID differential gain
+            kF = .2;        //V-PID feed forward gain
 
     /**
      * Constructor
@@ -39,19 +39,20 @@ public class Shooter {
         try {
 
             //Encoder enabled shooter jag setup: MUST FOLLOW THIS SEQUENCE OR ENCODER OR MOTOR WILL NOT WORK
-            m_shooterA = new CANJaguar(RobotIOMap.SHOOTER_A_ID);        //Initialize jaguar
-            m_shooterA.setVoltageRampRate(48);                          //Voltage ramp rate to prevent high current spikes
-            m_shooterA.configNeutralMode(CANJaguar.NeutralMode.kCoast); //Put motor into coast mode to lower amount of sudden force on mechanism
-            m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);//Change mode to percent vbus
-            m_shooterA.changeControlMode(CANJaguar.ControlMode.kPosition);//Change mode to position mode
+            m_shooterA = new CANJaguar(RobotIOMap.SHOOTER_A_ID);                //Initialize jaguar
+            m_shooterA.setVoltageRampRate(48);                                  //Voltage ramp rate to prevent high current spikes
+            m_shooterA.configNeutralMode(CANJaguar.NeutralMode.kCoast);         //Put motor into coast mode to lower amount of sudden force on mechanism
+            m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);   //Change mode to percent vbus
+            m_shooterA.changeControlMode(CANJaguar.ControlMode.kPosition);      //Change mode to position mode
             m_shooterA.setPositionReference(CANJaguar.PositionReference.kQuadEncoder);//Change position reference to encoder
-            m_shooterA.configEncoderCodesPerRev(360);                   //set Encoder type
-            m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);//Back to percent vbus mode
-            m_shooterA.configFaultTime(.5);                             //Half second fault time to minimize down time in case of fault
+            m_shooterA.configEncoderCodesPerRev(360);                           //set Encoder type
+            m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);   //Back to percent vbus mode
+            m_shooterA.configFaultTime(.5);                                     //Half second fault time to minimize down time in case of fault
         } catch (Exception e) {
             System.err.println("[SHOOTER-A]Error initializing");
             e.printStackTrace();
         }
+        
         try {
             m_shooterB = new CANJaguar(RobotIOMap.SHOOTER_B_ID);
             m_shooterB.configNeutralMode(CANJaguar.NeutralMode.kCoast);
@@ -69,14 +70,17 @@ public class Shooter {
     private double prevT = System.currentTimeMillis();
 
     public double getEncoderRate() {
-        double scalar = -((85423.972664328747414800827263735) / 250) * 360; //-542.63565891472*3.0;//-
+        double scalar = -29051.864698566067815887346080672;//-((85423.972664328747414800827263735) / 250) * 360; //-542.63565891472*3.0;//-
         try {
             prevPos = pos;
             pos = m_shooterA.getPosition();
+            
             double time = System.currentTimeMillis();
+            
             double newVel = (pos - prevPos) / (time - prevT); //Velocity is change in position divided by change in unit time
             prevT = time;
             vel = vel * a + (1 - a) * newVel; // Filter algorithm. Tune a up for more filter
+            
             return vel * scalar;              //Scales value to reasonable values
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,7 +123,7 @@ public class Shooter {
         if (setPointV < 200) {   //Set some deadband on velocity control
             out = 0;            //If commanded a very low speed, coast to a stop
         } else {
-            out += -.000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);  //PID + feedforward calculation
+            out += .000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);  //PID + feedforward calculation
         }
 
         out = Math.abs(out);
@@ -127,13 +131,6 @@ public class Shooter {
         if (out > 1) {  //Clamping the output to +- 1
             out = 1;
         }
-
-        System.out.println("Veloc: " + getEncoderRate());
-        System.out.println("SETV : " + setPointV);
-        System.out.println("Error: " + err);
-
-
-        out *= -1;
 
         shoot();
     }
@@ -151,19 +148,20 @@ public class Shooter {
      * @return 
      */
     public boolean isAtTargetSpeed() {
-        System.out.println("Veloc: " + getEncoderRate());
-        System.out.println("Error: " + err);
-        return (err < 100);// && !(setPointV != 0);
+        return (Math.abs(err) < 100); /*&& 
+                Math.abs(prevErr) < 150 && 
+                Math.abs(prevPrevErr) < 200 && 
+               !(setPointV != 0));*/
     }
 
     /**
      * Sets the voltage of the roller wheels
      * @param voltage The voltage value from -1 to 1
      */
-    private void setWheelVoltage(double voltage) {
+    public void setWheelVoltage(double voltage) {
         try {
-            m_shooterA.setX(-voltage, RobotIOMap.SHOOTER_SYNC_ID);
-            m_shooterB.setX(voltage, RobotIOMap.SHOOTER_SYNC_ID);
+            m_shooterA.setX(voltage, RobotIOMap.SHOOTER_SYNC_ID);
+            m_shooterB.setX(-voltage, RobotIOMap.SHOOTER_SYNC_ID);
             CANJaguar.updateSyncGroup(RobotIOMap.SHOOTER_SYNC_ID);
         } catch (Exception e) {
             e.printStackTrace();
@@ -192,6 +190,7 @@ public class Shooter {
         try {
             m_print.println("Position: " + m_shooterA.getPosition());
             m_print.println("Velocity: " + getEncoderRate());
+            m_print.println("AvgError: " + (err + prevErr + prevPrevErr)/3);
         } catch (Exception e) {
         }
     }

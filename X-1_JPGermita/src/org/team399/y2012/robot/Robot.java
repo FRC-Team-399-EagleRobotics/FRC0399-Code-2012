@@ -60,5 +60,6 @@ public class Robot {
      */
     public void run() {
         shooter.update();
+        //shooter.print();
     }
 }

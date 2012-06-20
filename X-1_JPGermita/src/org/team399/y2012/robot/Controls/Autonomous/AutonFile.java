@@ -29,19 +29,20 @@ public class AutonFile {
      * Reads the file into memory
      */
     private void read() {
-        InputStream is = getClass().getResourceAsStream("help.txt");
+        InputStream is = getClass().getResourceAsStream(m_filename);
         StringBuffer sb = new StringBuffer();
         try {
-            int chars;
-            while ((chars = is.read()) != -1) {
+            int chars = is.read();
+            while (is.read() != -1) {
                 sb.append((char) chars);
             }
         } catch (Exception e) {
         }
 
-        String NL = System.getProperty("line.separator");
-        System.out.println("Read from file:");
+        String NL = "\n";
+        System.out.println("Read from file: ");
         String file = sb.toString();
+        System.out.println(file);
         String[] lines = StringUtils.split(file, NL);
         String[][] elements = new String[lines.length][];
 

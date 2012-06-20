@@ -126,8 +126,8 @@ public class Color {
         hue = fMod(hue, 360.0);
 
         double Hprime = hue / 60.0;
-        double C = val * sat;
-        double X = C * (1 - Math.abs(fMod(Hprime, 2) - 1));
+        double C = sat * (1 - Math.abs(fMod(Hprime, 2) - 1));
+        double X = C * val;
 
         switch ((int) Hprime) {
             case 0:
@@ -174,13 +174,14 @@ public class Color {
      * @return 
      */
     private static double fMod(double input, double mod) {
-        double output = input / mod;
-        output -= (int) output;
-        output *= mod;
-
-        if (output < 0) {
-            output += mod;
-        }
+//        double output = input / mod;
+//        output -= (int) output;
+//        output *= mod;
+//
+//        if (output < 0) {
+//            output += mod;
+//        }
+        double output = input % mod;
         return output;
     }
 

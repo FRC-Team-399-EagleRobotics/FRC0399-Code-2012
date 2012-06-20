@@ -118,8 +118,12 @@ public class EagleEye {
      * A demonstration mode for the light ring. Flashes nifty colors.
      */
     public void demoMode() {
+        
         long timer = System.currentTimeMillis();
-        timer = timer % 16500;
+        //timer = timer % 16500;
+        //timer = timer % 5000;
+        //ring.setHSL((float)(timer/13.888888), 255.0, 100.0);
+        //ring.setRGB(Math.sin((double)(timer/5000) * (2*Math.PI)), Math.cos((double)(timer/5000) * (2*Math.PI)), Math.sin((timer/5000) + (2*Math.PI)));
 
         Color[] patriotic = {
             Color.fromRGB(1, 0, 0),
@@ -131,7 +135,7 @@ public class EagleEye {
             Color.fromHSL(120, 255, 50),
             Color.fromHSL(275, 255, 50),};
 
-        Color[] demoColors = teamSpirit;
+        Color[] demoColors = patriotic;
 
 
         if (EagleMath.isInBand(timer, 0, 5000)) {

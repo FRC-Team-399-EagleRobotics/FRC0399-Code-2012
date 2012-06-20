@@ -7,6 +7,7 @@ package org.team399.y2012.robot.Systems;
 import edu.wpi.first.wpilibj.AnalogChannel;
 import edu.wpi.first.wpilibj.Solenoid;
 import org.team399.y2012.robot.Config.RobotIOMap;
+import org.team399.y2012.Utilities.RateLimitFilter;
 
 /**
  * Class encapsulating the entire intake conveyor belt system, including dropper
@@ -19,6 +20,7 @@ public class Intake {
     Solenoid m_dropper;         //Solenoid for bridge mechanism
     private final double hasBallThresh = .5;   //Threshold
     //TODO: Tweak this value for real ball
+    RateLimitFilter vFil = new RateLimitFilter(.5);
 
     /**
      * Constructor
@@ -34,7 +36,9 @@ public class Intake {
      * @param value 
      */
     public void setIntake(double value) {
-        m_intake.set(value);
+        //vFil.update(value*.7);
+        if(value == 0) vFil.reset();
+        m_intake.set(value*-.7);
     }
 
     /**

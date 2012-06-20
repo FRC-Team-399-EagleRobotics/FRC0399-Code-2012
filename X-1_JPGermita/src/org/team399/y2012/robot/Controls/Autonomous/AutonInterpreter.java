@@ -32,7 +32,7 @@ public class AutonInterpreter {
      */
     public void run() {
         long commandStartTime = System.currentTimeMillis();
-        if ((15000 - (System.currentTimeMillis() - autonStartTime)) < 10000) {
+        //if ((15000 - (System.currentTimeMillis() - autonStartTime)) < 10000) {
             for (int i = 0; i < m_parsedFile.length; i++) {  //Cycling through file lines
                 System.out.println("Line: " + i);
 
@@ -45,8 +45,8 @@ public class AutonInterpreter {
                 if (currCommand.equals("STOP")) {
                     break;
                 }
-                for (int j = 0; j < m_parsedFile[i].length; j++) {
-                    args[j] = StringUtils.toDouble(m_parsedFile[i][j]);
+                for (int j = 1; j < m_parsedFile[i].length; j++) {
+                    args[j] = StringUtils.toDouble(m_parsedFile[i][j].trim());
                 }
 
                 while (!doLine(currCommand, args)) {
@@ -54,8 +54,8 @@ public class AutonInterpreter {
                     System.out.println("Time since new command: " + ((System.currentTimeMillis() - commandStartTime) / 1000));
                 }
             }
-        } else {
-        }
+        //}else {
+        //}
 
     }
 
@@ -65,11 +65,13 @@ public class AutonInterpreter {
             return true;
         } else if (command.equals("WAIT")) {
             if (System.currentTimeMillis() - commandStartTime < args[0]) {
+                System.out.println("Waiting for " + args[0] + " ms");
                 return false;
             }
             return true;
         } else if (command.equals("DRIVE_POWER")) {
-            Main.bot.drive.tankDrive(args[0], args[1]);
+            System.out.println("Driving");
+            //Main.bot.drive.tankDrive(args[0]/100, args[1]/100);
             if (args[2] == 0) {
                 Main.bot.drive.lowGear();
             } else {
