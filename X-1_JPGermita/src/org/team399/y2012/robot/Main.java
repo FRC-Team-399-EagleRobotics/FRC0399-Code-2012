@@ -78,13 +78,13 @@ public class Main extends IterativeRobot {
 
 //        bot.drive.tankDrive(leftPower, rightPower);
 //
-//        if (shift) {
+//        if (!shift) {
 //            bot.drive.highGear();
 //        } else {
 //            bot.drive.lowGear();
 //        }
-//
-//        bot.intake.setDropper(intake);
+
+        bot.intake.setDropper(intake);
         if(!leftJoy.getRawButton(10)) {
             bot.drive.iCantBelieveItsNotButterDrive(leftPower, -rightPower, shift);
         } else {
@@ -108,7 +108,7 @@ public class Main extends IterativeRobot {
 
         double shooterSpeed = //4000
                 EagleMath.map((float)funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB), 
-                                           (float)1.5, (float)3.3, (float)500, (float)3500)
+                                           (float)1.75, (float)5.0, (float)500, (float)3000)
                 ,
                 intakeSpeed = funbox.getAnalog(DriverStationUserInterface.PORTS.BELT_KNOB),
                 turretAngle = 0;
@@ -124,13 +124,13 @@ public class Main extends IterativeRobot {
 //            manualAim = true;
 //        }
 
+        //System.out.println("Turret knob: " + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
         if (manualAim) {
-            bot.turret.setAngle(EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 3.3, (float) 2.2, (float) 9.6, (float) 1.6));//TODO: scale to range
+            bot.turret.setAngle(EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 4.75, (float) 2, (float) 9.6, (float) 1.0));//TODO: scale to range
         } else if (autoAimLock) {
             bot.aic.lockOn();
         } else if (autoAimLFend) {
             bot.aic.leftFender();
-            
         } else if (autoAimRFend) {
             bot.aic.rightFender();
         } else if (autoAimKey) {
@@ -156,7 +156,7 @@ public class Main extends IterativeRobot {
         } else {
             bot.shooter.setVelocity(0);
 
-            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON)) {
+            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON) || leftJoy.getRawButton(7)) {
                 bot.intake.setIntake(1.0);
             } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON)) {
                 bot.intake.setIntake(-1.0);

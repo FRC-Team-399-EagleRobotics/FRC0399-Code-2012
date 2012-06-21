@@ -14,6 +14,8 @@ import org.team399.y2012.robot.Config.RobotIOMap;
 public class Turret {
 
     private CANJaguar m_turret;
+    private double p = -100, i = 0, d = -190, deadband = .25;
+    
 
     /**
      * Constructor.
@@ -26,7 +28,7 @@ public class Turret {
             m_turret.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
             m_turret.configPotentiometerTurns(10);
             m_turret.configSoftPositionLimits(1.0, 9.6);                                            //TURRET LIMITS
-            m_turret.setPID(-125, 0, -20);                                                          //TURRET PID CONSTANTS
+            m_turret.setPID(p, i, d);                                                          //TURRET PID CONSTANTS
             m_turret.configNeutralMode(CANJaguar.NeutralMode.kBrake);
             m_turret.enableControl();
         } catch (Exception e) {
@@ -41,8 +43,13 @@ public class Turret {
      */
     public void setAngle(double angle) {
         try {
-            if (Math.abs(getActualPosition() - angle) < .015) {
+            //m_turret.changeControlMode(CANJaguar.ControlMode.kPosition);
+            if (Math.abs(m_turret.getX() - getActualPosition()) < deadband) {
+                System.out.println("Turret Within Tolerance at: " + getActualPosition());
                 m_turret.setX(getActualPosition());
+                //m_turret.disableControl();
+                //m_turret.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
+                //m_turret.setX();
             } else {
                 m_turret.setX(angle);// - 3);
             }
@@ -51,6 +58,7 @@ public class Turret {
             e.printStackTrace();
         }
     }
+    
 
     /**
      * Get the actual position of the turret

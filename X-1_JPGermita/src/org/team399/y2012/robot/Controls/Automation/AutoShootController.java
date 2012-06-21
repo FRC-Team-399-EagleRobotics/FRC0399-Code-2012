@@ -39,7 +39,7 @@ public class AutoShootController {
         System.out.println("Autoshooting...");
         m_shooter.setVelocity(shooterSpeed);
         
-        beltSpeed *= -1;
+        beltSpeed *= 1;
         
         if(m_shooter.isAtTargetSpeed()) {
             m_intake.setIntake(beltSpeed);

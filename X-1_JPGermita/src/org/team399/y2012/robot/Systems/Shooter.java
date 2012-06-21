@@ -24,9 +24,9 @@ public class Shooter {
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
      */
-    private double kP = 4,  //Velocity PID Proportional gain
-            kI = 4,         //V-PID Integral gain
-            kD = 5,         //V-PID differential gain
+    private double kP = 5,  //Velocity PID Proportional gain
+            kI = 5,         //V-PID Integral gain
+            kD = 8,         //V-PID differential gain
             kF = .2;        //V-PID feed forward gain
 
     /**
@@ -40,7 +40,7 @@ public class Shooter {
 
             //Encoder enabled shooter jag setup: MUST FOLLOW THIS SEQUENCE OR ENCODER OR MOTOR WILL NOT WORK
             m_shooterA = new CANJaguar(RobotIOMap.SHOOTER_A_ID);                //Initialize jaguar
-            m_shooterA.setVoltageRampRate(48);                                  //Voltage ramp rate to prevent high current spikes
+            m_shooterA.setVoltageRampRate(56);                                  //Voltage ramp rate to prevent high current spikes
             m_shooterA.configNeutralMode(CANJaguar.NeutralMode.kCoast);         //Put motor into coast mode to lower amount of sudden force on mechanism
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);   //Change mode to percent vbus
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPosition);      //Change mode to position mode
@@ -57,7 +57,7 @@ public class Shooter {
             m_shooterB = new CANJaguar(RobotIOMap.SHOOTER_B_ID);
             m_shooterB.configNeutralMode(CANJaguar.NeutralMode.kCoast);
             m_shooterB.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
-            m_shooterB.setVoltageRampRate(48);
+            m_shooterB.setVoltageRampRate(56);
             m_shooterA.configFaultTime(.5);
         } catch (Exception e) {
             System.err.println("[SHOOTER-B]Error initializing");
@@ -66,7 +66,7 @@ public class Shooter {
         m_hood = new Solenoid(RobotIOMap.HOOD_PORT);
     }
     private double vel = 0;
-    private final double a = 0.5;
+    private final double a = .75;
     private double prevT = System.currentTimeMillis();
 
     public double getEncoderRate() {
@@ -81,7 +81,8 @@ public class Shooter {
             prevT = time;
             vel = vel * a + (1 - a) * newVel; // Filter algorithm. Tune a up for more filter
             
-            return vel * scalar;              //Scales value to reasonable values
+            if(Math.abs(vel*scalar) < 50) return 0;
+            return vel*scalar;              //Scales value to reasonable values
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -148,7 +149,7 @@ public class Shooter {
      * @return 
      */
     public boolean isAtTargetSpeed() {
-        return (Math.abs(err) < 100); /*&& 
+        return (Math.abs(err) < 275); /*&& 
                 Math.abs(prevErr) < 150 && 
                 Math.abs(prevPrevErr) < 200 && 
                !(setPointV != 0));*/

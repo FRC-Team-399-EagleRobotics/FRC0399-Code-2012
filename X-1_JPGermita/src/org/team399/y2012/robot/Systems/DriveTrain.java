@@ -217,7 +217,7 @@ public class DriveTrain {
         double turning = twoStickToTurning(left, right);	//convert two stick commands to arcade turning
 
         double e_tSens = .65;								//scalar value for turning desensitivity
-        double tLim = (1 - Math.abs(throttle)) * e_tSens;	//Turn limiting scalar, based on throttle
+        double tLim = (1.2 - Math.abs(throttle)) * e_tSens;	//Turn limiting scalar, based on throttle
 
         if (!gear) {			//High gear
             turning *= tLim;            //Apply turn scaling if in high gear
