@@ -174,14 +174,13 @@ public class Color {
      * @return 
      */
     private static double fMod(double input, double mod) {
-//        double output = input / mod;
-//        output -= (int) output;
-//        output *= mod;
-//
-//        if (output < 0) {
-//            output += mod;
-//        }
-        double output = input % mod;
+        double output = input / mod;
+        output -= (int) output;
+        output *= mod;
+
+        if (output < 0) {
+            output += mod;
+        }
         return output;
     }
 

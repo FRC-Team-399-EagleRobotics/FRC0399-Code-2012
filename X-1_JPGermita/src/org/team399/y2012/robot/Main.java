@@ -126,7 +126,7 @@ public class Main extends IterativeRobot {
 
         //System.out.println("Turret knob: " + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
         if (manualAim) {
-            bot.turret.setAngle(EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 4.75, (float) 2, (float) 9.6, (float) 1.0));//TODO: scale to range
+            bot.turret.setAngle(EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 0, (float) 10, (float) -6));//TODO: scale to range
         } else if (autoAimLock) {
             bot.aic.lockOn();
         } else if (autoAimLFend) {
