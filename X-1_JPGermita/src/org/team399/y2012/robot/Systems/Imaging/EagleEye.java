@@ -120,38 +120,38 @@ public class EagleEye {
     public void demoMode() {
         
         long timer = System.currentTimeMillis();
-        //timer = timer % 16500;
+        timer = timer % 16500;
         //timer = timer % 5000;
-        //ring.setHSL((float)(timer/13.888888), 255.0, 100.0);
+        ring.setHSL((float)(timer/13.888888), 255.0, 100.0);
         //ring.setRGB(Math.sin((double)(timer/5000) * (2*Math.PI)), Math.cos((double)(timer/5000) * (2*Math.PI)), Math.sin((timer/5000) + (2*Math.PI)));
-
-        Color[] patriotic = {
-            Color.fromRGB(1, 0, 0),
-            Color.fromRGB(.9, 1, 1),
-            Color.fromRGB(0, 1, 0),};
-
-        Color[] teamSpirit = {
-            Color.fromHSL(20, 255, 50),
-            Color.fromHSL(120, 255, 50),
-            Color.fromHSL(275, 255, 50),};
-
-        Color[] demoColors = patriotic;
-
-
-        if (EagleMath.isInBand(timer, 0, 5000)) {
-            ring.set(demoColors[0]);
-        } else if (EagleMath.isInBand(timer, 5500, 10500)) {
-            ring.set(demoColors[1]);
-        } else if (EagleMath.isInBand(timer, 11000, 15000)) {
-            ring.set(demoColors[2]);
-        } else {
-            long fadeTimer = (timer % 500);
-            double rStep = ring.getColor().getRed() / 500;
-            double gStep = ring.getColor().getGreen() / 500;
-            double bStep = ring.getColor().getBlue() / 500;
-            ring.setRGB(ring.getColor().getRed() - (fadeTimer * rStep),
-                    ring.getColor().getGreen() - (fadeTimer * gStep),
-                    ring.getColor().getBlue() - (fadeTimer * bStep));
-        }
+//
+//        Color[] patriotic = {
+//            Color.fromRGB(1, 0, 0),
+//            Color.fromRGB(.9, 1, 1),
+//            Color.fromRGB(0, 1, 0),};
+//
+//        Color[] teamSpirit = {
+//            Color.fromHSL(20, 255, 50),
+//            Color.fromHSL(120, 255, 50),
+//            Color.fromHSL(275, 255, 50),};
+//
+//        Color[] demoColors = patriotic;
+//
+//
+//        if (EagleMath.isInBand(timer, 0, 5000)) {
+//            ring.set(demoColors[0]);
+//        } else if (EagleMath.isInBand(timer, 5500, 10500)) {
+//            ring.set(demoColors[1]);
+//        } else if (EagleMath.isInBand(timer, 11000, 15000)) {
+//            ring.set(demoColors[2]);
+//        } else {
+//            long fadeTimer = (timer % 500);
+//            double rStep = ring.getColor().getRed() / 500;
+//            double gStep = ring.getColor().getGreen() / 500;
+//            double bStep = ring.getColor().getBlue() / 500;
+//            ring.setRGB(ring.getColor().getRed() - (fadeTimer * rStep),
+//                    ring.getColor().getGreen() - (fadeTimer * gStep),
+//                    ring.getColor().getBlue() - (fadeTimer * bStep));
+//        }
     }
 }

@@ -24,9 +24,9 @@ public class Shooter {
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
      */
-    private double kP = 5,  //Velocity PID Proportional gain
-            kI = 5,         //V-PID Integral gain
-            kD = 8,         //V-PID differential gain
+    private double kP = 5, //Velocity PID Proportional gain
+            kI = 5, //V-PID Integral gain
+            kD = 8, //V-PID differential gain
             kF = .2;        //V-PID feed forward gain
 
     /**
@@ -52,7 +52,7 @@ public class Shooter {
             System.err.println("[SHOOTER-A]Error initializing");
             e.printStackTrace();
         }
-        
+
         try {
             m_shooterB = new CANJaguar(RobotIOMap.SHOOTER_B_ID);
             m_shooterB.configNeutralMode(CANJaguar.NeutralMode.kCoast);
@@ -74,15 +74,17 @@ public class Shooter {
         try {
             prevPos = pos;
             pos = m_shooterA.getPosition();
-            
+
             double time = System.currentTimeMillis();
-            
+
             double newVel = (pos - prevPos) / (time - prevT); //Velocity is change in position divided by change in unit time
             prevT = time;
             vel = vel * a + (1 - a) * newVel; // Filter algorithm. Tune a up for more filter
-            
-            if(Math.abs(vel*scalar) < 50) return 0;
-            return vel*scalar;              //Scales value to reasonable values
+
+            if (Math.abs(vel * scalar) < 50) {
+                return 0;
+            }
+            return vel * scalar;              //Scales value to reasonable values
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -120,6 +122,17 @@ public class Shooter {
         prevPrevErr = prevErr;
         prevErr = err;
         err = setPointV - getEncoderRate();
+        try {
+            if (Math.abs(err) > 1000) {
+
+                m_shooterA.setVoltageRampRate(56);
+                m_shooterB.setVoltageRampRate(56);
+            } else {
+                m_shooterA.setVoltageRampRate(24);
+                m_shooterB.setVoltageRampRate(24);
+            }
+        } catch (Exception e) {
+        }
 
         if (setPointV < 200) {   //Set some deadband on velocity control
             out = 0;            //If commanded a very low speed, coast to a stop
@@ -150,9 +163,9 @@ public class Shooter {
      */
     public boolean isAtTargetSpeed() {
         return (Math.abs(err) < 275); /*&& 
-                Math.abs(prevErr) < 150 && 
-                Math.abs(prevPrevErr) < 200 && 
-               !(setPointV != 0));*/
+        Math.abs(prevErr) < 150 && 
+        Math.abs(prevPrevErr) < 200 && 
+        !(setPointV != 0));*/
     }
 
     /**
@@ -191,7 +204,7 @@ public class Shooter {
         try {
             m_print.println("Position: " + m_shooterA.getPosition());
             m_print.println("Velocity: " + getEncoderRate());
-            m_print.println("AvgError: " + (err + prevErr + prevPrevErr)/3);
+            m_print.println("AvgError: " + (err + prevErr + prevPrevErr) / 3);
         } catch (Exception e) {
         }
     }

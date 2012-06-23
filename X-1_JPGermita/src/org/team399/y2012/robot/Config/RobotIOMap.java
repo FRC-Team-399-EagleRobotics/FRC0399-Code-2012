@@ -87,7 +87,8 @@ public class RobotIOMap {
     /**
      * Dropper solenoid port
      */
-    public static final int DROPPER_PORT = 3;
+    public static final int DROPPER_PORTA = 4;
+    public static final int DROPPER_PORTB = 7;
     /**
      * hood solenoid port
      */
