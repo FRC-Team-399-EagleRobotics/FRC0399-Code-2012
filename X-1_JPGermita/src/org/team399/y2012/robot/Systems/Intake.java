@@ -42,12 +42,21 @@ public class Intake {
         m_intake.set(value);
     }
 
+    boolean flopped = false, value = false;
+
+
     /**
-     * Set the state of the dropper solenoid(s)
-     * @param value 
+     * Move the dropper
+     * @param down Button input
      */
-    public void setDropper(boolean value) {
-        m_dropper.set((value) ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
+    public void setDropper(boolean down) {
+        if (down && !flopped) {
+            value = !value;
+            m_dropper.set((value) ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
+            flopped = true;
+        } else if (!down) {
+            flopped = false;
+        }
     }
 
     /**
