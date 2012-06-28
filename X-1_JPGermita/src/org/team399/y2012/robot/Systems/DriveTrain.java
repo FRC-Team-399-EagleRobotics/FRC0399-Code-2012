@@ -7,8 +7,10 @@ package org.team399.y2012.robot.Systems;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
+import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.Utilities.RateLimitFilter;
 import org.team399.y2012.robot.Config.RobotIOMap;
+
 
 /**
  * Drivetrain class that encapsulates all basic drivetrain functions
@@ -25,17 +27,20 @@ public class DriveTrain {
     private Gyro pitch = new Gyro(RobotIOMap.GYRO_PITCH);
     private RateLimitFilter m_pitchFilter = new RateLimitFilter(.1);    //Rate limit filters to help filter out noise
     private RateLimitFilter m_yawFilter = new RateLimitFilter(.1);      //from gyro readings
+    private PrintStream ps_drive = new PrintStream("[DRIVE] ");
 
     /**
      * Constructor
      */
     public DriveTrain() {
+        ps_drive.println("Drivetrain Initialization Started...");
         shifter = new Solenoid(RobotIOMap.SHIFTER_PORT);
 
         //Initialize drive motor controllers in their own try-catch statements to catch individual errors
+        ps_drive.println("LeftA Initialization started...");
         try {
             m_leftA = new CANJaguar(RobotIOMap.LEFT_DRIVE_A_ID);
-            //m_leftA.changeControlMode(CANJaguar.ControlMode.kVoltage);
+            m_leftA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
             m_leftA.setVoltageRampRate(56);
             m_leftA.configNeutralMode(CANJaguar.NeutralMode.kCoast);
             m_leftA.configFaultTime(.5);
@@ -43,19 +48,27 @@ public class DriveTrain {
             System.err.println("[DRIVE-LEFT-A]Error initializing");
             e.printStackTrace();
         }
+        ps_drive.println("LeftA Initialization Complete!");
+        ps_drive.println("LeftB Initialization started...");
         try {
             m_leftB = new CANJaguar(RobotIOMap.LEFT_DRIVE_B_ID);
-            //m_leftB.changeControlMode(CANJaguar.ControlMode.kVoltage);
             m_leftB.setVoltageRampRate(56);
+            
+            m_leftB.changeControlMode(CANJaguar.ControlMode.kPosition);
+            m_leftB.setPositionReference(CANJaguar.PositionReference.kQuadEncoder);
+            m_leftB.configEncoderCodesPerRev(360);
+            
+            m_leftB.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
             m_leftB.configNeutralMode(CANJaguar.NeutralMode.kBrake);
             m_leftB.configFaultTime(.5);
         } catch (Exception e) {
             System.err.println("[DRIVE-LEFT-B]Error initializing");
             e.printStackTrace();
         }
+        ps_drive.println("LeftB Initialization Complete!");
+        ps_drive.println("RightA Initialization started...");
         try {
             m_rightA = new CANJaguar(RobotIOMap.RIGHT_DRIVE_A_ID);
-            //m_rightA.changeControlMode(CANJaguar.ControlMode.kVoltage);
             m_rightA.setVoltageRampRate(56);
             m_rightA.configNeutralMode(CANJaguar.NeutralMode.kCoast);
             m_rightA.configFaultTime(.5);
@@ -63,9 +76,10 @@ public class DriveTrain {
             System.err.println("[DRIVE-RIGHT-A]Error initializing");
             e.printStackTrace();
         }
+        ps_drive.println("RightA Initialization Complete!");
+        ps_drive.println("RightB Initialization started...");
         try {
             m_rightB = new CANJaguar(RobotIOMap.RIGHT_DRIVE_B_ID);
-            //m_rightB.changeControlMode(CANJaguar.ControlMode.kVoltage);
             m_rightB.setVoltageRampRate(56);
             m_rightB.configNeutralMode(CANJaguar.NeutralMode.kBrake);
             m_rightB.configFaultTime(.5);
@@ -73,9 +87,12 @@ public class DriveTrain {
             System.err.println("[DRIVE-RIGHT-B]Error initializing");
             e.printStackTrace();
         }
-
+        ps_drive.println("RightB Initialization Complete!");
+        ps_drive.println("CAN Jaguar initialization complete");
         yaw.reset();
         pitch.reset();
+        ps_drive.println("Gyro initialization complete");
+        ps_drive.println("Drivetrain initialization complete!");
     }
 
     /**
@@ -327,5 +344,40 @@ public class DriveTrain {
      */
     public void highGear() {
         shifter.set(false);
+    }
+    private int pl_counter = 0; //PID lock run counter
+    private double pl_pos = 0, pl_err = 0, pl_p = -1.00;
+    private double pl_deadband = .1250;
+
+    /**
+     * PID positional lock for bridge balancing and defensive maneuvers
+     * @param enabled 
+     */
+    public void PIDLock(boolean enabled) {
+        if (enabled) {
+            lowGear();
+            if (pl_counter == 0) {
+                try {
+                    pl_pos = m_leftB.getPosition();
+                } catch (Exception e) {
+                }
+            }
+            try {
+                pl_err = pl_pos - m_leftB.getPosition();
+                
+            } catch (Exception e) {
+            }
+
+            if (Math.abs(pl_err) < pl_deadband) {
+                tankDrive(0, 0);
+            } else {
+                double power = pl_err * pl_p;
+                tankDrive(power, -power);
+            }
+
+            pl_counter++;
+        } else {
+            pl_counter = 0;
+        }
     }
 }

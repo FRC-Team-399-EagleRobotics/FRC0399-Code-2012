@@ -30,16 +30,21 @@ public class AutoDriveTrain {
         m_drive.lowGear();                          //Lock in low gear for low backdrivability
         double pitch = m_drive.getPitch();          //Read the pitch value from gyro
         double yaw = m_drive.getAngleWraparound();
-        
-        if(Math.abs(pitch) < 15) pitch = 0;         //Threshold for pitch. Prevents tiny movements that spoil 
-        
-        double P = 0.05;                            //P constant for closed loop controller
-        
-        double out = P*pitch;                       //P controller
-        
-        m_drive.driveToAngle(out+throttle, 0);               //output
+
+        throttle *= .6;
+
+        if (Math.abs(pitch) < 15) {
+            pitch = 0;         //Threshold for pitch. Prevents tiny movements that spoil balances
+            m_drive.PIDLock(true);
+        } else {
+            double P = 0.05;                            //P constant for closed loop controller
+
+            double out = P * pitch;                       //P controller
+
+            m_drive.driveToAngle(out + throttle, 0);               //output
+        }
     }
-    
+
     /**
      * Drive to a distance in inches
      * @param distance distance in inches

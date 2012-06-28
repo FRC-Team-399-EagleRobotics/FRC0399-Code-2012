@@ -4,9 +4,11 @@
  */
 package org.team399.y2012.robot.Systems;
 
-import com.sun.squawk.util.MathUtils;
 import edu.wpi.first.wpilibj.CANJaguar;
+import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
+import org.team399.y2012.Utilities.MovingAverage;
+
 
 /**
  *
@@ -16,14 +18,18 @@ public class Turret {
 
     private CANJaguar m_turret;
     //private double p = -100, i = 0, d = -190, deadband = .25;
-    private double positionRaw = 5.0;
-    private double errorTolerance = .1;
+    public double positionRaw = 5.0;
+    private double errorTolerance = .075;
+    private PrintStream m_print = new PrintStream("[Turret] ");
+    private MovingAverage actualFilter = new MovingAverage(10);
+    private MovingAverage setFilter = new MovingAverage(8);
 
     /**
      * Constructor.
      * @param CAN_ID Motor's CAN ID
      */
     public Turret() {
+        m_print.println("Turret Initialization started...");
         try {
             m_turret = new CANJaguar(RobotIOMap.TURRET_ID);
             m_turret.changeControlMode(CANJaguar.ControlMode.kPosition);
@@ -38,6 +44,10 @@ public class Turret {
             System.err.println("[TURRET]Error initializing");
             e.printStackTrace();
         }
+        m_print.println("Turret Initialization complete!");
+        for(int i = 0; i < 9; i++) {
+            setFilter.calculate(positionRaw);
+        }
     }
 
     /**
@@ -45,8 +55,8 @@ public class Turret {
      * @param angle in pot rotations
      */
     public void setAngle(double angle) {
-        positionRaw = angle;
-        System.out.println("Turret setAngle: " + angle);
+        positionRaw = setFilter.calculate(angle);
+        //System.out.println("Turret setAngle: " + angle);
         bangBangController();
     }
     
@@ -56,14 +66,14 @@ public class Turret {
     }
 
     private void bangBangController() {
-        double speed = .5;
+        double speed = .2;
         try {
             if (Math.abs(getActualPosition() - positionRaw) > errorTolerance) {
                 if(Math.abs(getActualPosition() - positionRaw) > .5) {
-                    speed  = 1.0;
+                    speed  = .7;
                 }
                 
-                if (positionRaw > getActualPosition() ) {
+                if (positionRaw > getActualPosition()) {
                     m_turret.setX(-speed);
                 } else if (positionRaw < getActualPosition()) {
                     m_turret.setX(speed);
@@ -84,7 +94,8 @@ public class Turret {
      */
     public double getActualPosition() {
         try {
-            return m_turret.getPosition();
+            
+            return actualFilter.calculate(m_turret.getPosition());
         } catch (Exception e) {
             e.printStackTrace();
         }

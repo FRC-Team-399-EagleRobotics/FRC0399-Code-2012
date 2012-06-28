@@ -4,6 +4,7 @@
  */
 package org.team399.y2012.robot;
 
+import org.team399.y2012.Utilities.DsLcdStream;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Controls.Automation.AutoAimController;
 import org.team399.y2012.robot.Controls.Automation.AutoShootController;
@@ -31,6 +32,7 @@ public class Robot {
      * Constructor. Insert any other initialization commands here
      */
     public Robot() {
+        long initStartTime = System.currentTimeMillis();
         ps_bot.println("Initialization started...");
 
         drive = new DriveTrain();     //Drivetrain Instantiation
@@ -50,8 +52,22 @@ public class Robot {
         ps_bot.println("Auto controllers initialized");
 //        ps_bot.println("Excecuting garbage collection...");
 //        System.gc();
-        ps_bot.println("Initialization complete");
-        
+        ps_bot.println("Initialization complete!");
+
+        ps_bot.println("/////////////////////////");
+        ps_bot.println("//       ooo    ooo    //");
+        ps_bot.println("//       ooo    ooo    //");
+        ps_bot.println("//                     //");
+        ps_bot.println("//     **************  //");
+        ps_bot.println("//      **        **   //");
+        ps_bot.println("//        **    **     //");
+        ps_bot.println("//          ****       //");
+        ps_bot.println("/////////////////////////");
+        ps_bot.println(" ");
+
+
+        ps_bot.println("Initialization took " + ((double) initStartTime) / 1000 + " seconds!");
+        DsLcdStream.printlnMain("Initialization complete! Took " + ((double) initStartTime) / 1000 + " seconds!");
     }
 
     /**
@@ -60,6 +76,9 @@ public class Robot {
      */
     public void run() {
         shooter.update();
-        //shooter.print();
+        DsLcdStream.println1("Shooter Set: " + shooter.setPointV + "          ");
+        DsLcdStream.println2("Shooter Act: " + shooter.getEncoderRate() + "          ");
+        DsLcdStream.println3("Turret Set: " + turret.positionRaw + "          ");
+        DsLcdStream.println4("Turret Act: " + turret.getActualPosition() + "          ");
     }
 }

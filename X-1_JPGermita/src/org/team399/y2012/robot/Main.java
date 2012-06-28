@@ -38,9 +38,11 @@ public class Main extends IterativeRobot {
         comp.start();
         bot.shooter.setEnabled(true);
     }
-    
+
     public void disabledPeriodic() {
         bot.eye.demoMode();
+//        System.out.println("Turret knob: " + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
+//        System.out.println("Scaled Knob: " + EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 10, (float) 0));
     }
 
     public void autonomousInit() {
@@ -64,7 +66,7 @@ public class Main extends IterativeRobot {
         bot.run();  //Basic robot functions that run continuously
         drive();    //Driver routine
         operate();  //operator routine
-        
+
     }
 
     /**
@@ -72,24 +74,20 @@ public class Main extends IterativeRobot {
      */
     public void drive() {
         double leftPower = leftJoy.getRawAxis(2), //Variables to customize controls easily
-                rightPower = -leftJoy.getRawAxis(4);
-        boolean shift = leftJoy.getRawButton(6),
-                intake = leftJoy.getRawButton(1);
-
-//        bot.drive.tankDrive(leftPower, rightPower);
-//
-//        if (!shift) {
-//            bot.drive.highGear();
-//        } else {
-//            bot.drive.lowGear();
-//        }
+                rightPower = -rightJoy.getRawAxis(2);//-leftJoy.getRawAxis(4);
+        boolean shift = leftJoy.getRawButton(1),
+                intake = rightJoy.getRawButton(1);
 
         bot.intake.setDropper(intake);
-        if(!leftJoy.getRawButton(10)) {
-            bot.drive.iCantBelieveItsNotButterDrive(leftPower, -rightPower, shift);
-        } else {
+        if (leftJoy.getRawButton(2)) {
             bot.drive.tankDrive(-.4, .4);
             bot.drive.lowGear();
+        } else if (rightJoy.getRawButton(2)) {
+            bot.drive.PIDLock(true);
+            System.out.println("BaseLocked!");
+        } else {
+            bot.drive.iCantBelieveItsNotButterDrive(leftPower, -rightPower, shift);
+            bot.drive.PIDLock(false);
         }
     }
 
@@ -98,8 +96,8 @@ public class Main extends IterativeRobot {
      */
     public void operate() {
 
-        boolean autoShoot = leftJoy.getRawButton(8),//funbox.getShooterSwitch().equals("AUTO")
-                //&& funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON),
+        boolean autoShoot = funbox.getShooterSwitch().equals("AUTO")
+                && funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON),
                 autoSpeed = false,
                 autoAimLock = false,
                 autoAimLFend = false,
@@ -107,16 +105,15 @@ public class Main extends IterativeRobot {
                 autoAimKey = false;
 
         double shooterSpeed = //4000
-                EagleMath.map((float)funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB), 
-                                           (float)1.75, (float)5.0, (float)500, (float)3000)
-                ,
+                EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
+                (float) 1.75, (float) 5.0, (float) 500, (float) 3500),
                 intakeSpeed = funbox.getAnalog(DriverStationUserInterface.PORTS.BELT_KNOB),
-                turretAngle = 0;
+                turretAngle = EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0);
         boolean hood = (funbox.getHoodSwitch().equals("AUTO") || funbox.getHoodSwitch().equals("MANUAL")),
                 shoot = funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON) && !autoShoot;
 
         boolean manualAim = funbox.getTurretSwitch().equals("MANUAL");
-        
+
 
 //        if (!(autoAimLock || autoAimLFend || autoAimRFend || autoAimKey)) {
 //            manualAim = false;
@@ -126,7 +123,7 @@ public class Main extends IterativeRobot {
 
         //System.out.println("Turret knob: " + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
         if (manualAim) {
-            bot.turret.setAngle(EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 0, (float) 10, (float) -6));//TODO: scale to range
+            bot.turret.setAngle(turretAngle);//TODO: scale to range
         } else if (autoAimLock) {
             bot.aic.lockOn();
         } else if (autoAimLFend) {
@@ -139,7 +136,7 @@ public class Main extends IterativeRobot {
 
         if (shoot) {
             bot.shooter.setVelocity(shooterSpeed);
-            
+
             if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON)) {
                 bot.intake.setIntake(1.0);
             } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON)) {
@@ -149,7 +146,7 @@ public class Main extends IterativeRobot {
             }
         } else if (autoShoot) {
             if (!autoSpeed) {
-                bot.shootController.shoot(shooterSpeed, 1);
+                bot.shootController.shoot(shooterSpeed, -1);
             } else {
                 bot.shootController.shootDist(bot.eye.getTallestTarget().distance, 1);
             }
@@ -157,17 +154,14 @@ public class Main extends IterativeRobot {
             bot.shooter.setVelocity(0);
 
             if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON) || leftJoy.getRawButton(7)) {
-                bot.intake.setIntake(1.0);
+                bot.intake.setIntake(-intakeSpeed);
             } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON)) {
-                bot.intake.setIntake(-1.0);
+                bot.intake.setIntake(intakeSpeed);
             } else {
                 bot.intake.setIntake(0);
             }
         }
-
-
         bot.shooter.setHood(hood);
-
 
     }
 }

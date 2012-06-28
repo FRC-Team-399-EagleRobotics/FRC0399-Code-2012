@@ -6,6 +6,7 @@ package org.team399.y2012.robot.Systems;
 
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Solenoid;
+import org.team399.y2012.Utilities.MovingAverage;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 
@@ -20,6 +21,8 @@ public class Shooter {
     private CANJaguar m_shooterB = null;
     private Solenoid m_hood = null;
     private PrintStream m_print = new PrintStream("[SHOOTER] ");
+    private MovingAverage velFilt = new MovingAverage(10);
+    
     /*************************************
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
@@ -35,7 +38,8 @@ public class Shooter {
      * @param HOOD_CAN_ID CAN ID for hood
      */
     public Shooter() {
-
+        m_print.println("Shooter Initialization started...");
+        m_print.println("ShooterA Initialization started...");
         try {
 
             //Encoder enabled shooter jag setup: MUST FOLLOW THIS SEQUENCE OR ENCODER OR MOTOR WILL NOT WORK
@@ -52,7 +56,8 @@ public class Shooter {
             System.err.println("[SHOOTER-A]Error initializing");
             e.printStackTrace();
         }
-
+        m_print.println("ShooterA Initialization complete!");
+        m_print.println("ShooterB Initialization started...");
         try {
             m_shooterB = new CANJaguar(RobotIOMap.SHOOTER_B_ID);
             m_shooterB.configNeutralMode(CANJaguar.NeutralMode.kCoast);
@@ -63,35 +68,40 @@ public class Shooter {
             System.err.println("[SHOOTER-B]Error initializing");
             e.printStackTrace();
         }
+        m_print.println("ShooterA Initialization complete!");
         m_hood = new Solenoid(RobotIOMap.HOOD_PORT);
+        m_print.println("Hood Solenoid Initialization complete!");
+        m_print.println("Shooter Initialization complete!");
     }
     private double vel = 0;
     private final double a = .75;
     private double prevT = System.currentTimeMillis();
 
     public double getEncoderRate() {
-        double scalar = -29051.864698566067815887346080672;//-((85423.972664328747414800827263735) / 250) * 360; //-542.63565891472*3.0;//-
+        double scalar = -29051.864698566067815887346080672;
         try {
             prevPos = pos;
             pos = m_shooterA.getPosition();
 
             double time = System.currentTimeMillis();
 
-            double newVel = (pos - prevPos) / (time - prevT); //Velocity is change in position divided by change in unit time
+            
+            double newVel = (pos - prevPos) / (((time - prevT)*(.0000166666666))); //Velocity is change in position divided by change in unit time, converted to minutes
             prevT = time;
-            vel = vel * a + (1 - a) * newVel; // Filter algorithm. Tune a up for more filter
-
+            //vel = vel * a + (1 - a) * newVel; // Filter algorithm. Tune a up for more filter
+            vel = velFilt.calculate(newVel)/2;
             if (Math.abs(vel * scalar) < 50) {
                 return 0;
             }
-            return vel * scalar;              //Scales value to reasonable values
+            System.out.println("Velocity: " + vel);
+            return vel; //* scalar;              //Scales value to reasonable values
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return 0.0; //Returns 0 if there was a fault in above code
     }
-    private double setPointV = 0;
+    public double setPointV = 0;
     private double err = 0, prevErr = err, prevPrevErr = err;
     private double pos = 0, prevPos = 0;
 
@@ -122,22 +132,23 @@ public class Shooter {
         prevPrevErr = prevErr;
         prevErr = err;
         err = setPointV - getEncoderRate();
-        try {
-            if (Math.abs(err) > 1000) {
-
-                m_shooterA.setVoltageRampRate(56);
-                m_shooterB.setVoltageRampRate(56);
-            } else {
-                m_shooterA.setVoltageRampRate(24);
-                m_shooterB.setVoltageRampRate(24);
-            }
-        } catch (Exception e) {
-        }
+//        try {
+//            if (Math.abs(err) > 1000) {
+//                m_shooterA.setVoltageRampRate(56);
+//                m_shooterB.setVoltageRampRate(56);
+//            } else {
+//                m_shooterA.setVoltageRampRate(24);
+//                m_shooterB.setVoltageRampRate(24);
+//            }
+//        } catch (Exception e) {
+//        }
 
         if (setPointV < 200) {   //Set some deadband on velocity control
             out = 0;            //If commanded a very low speed, coast to a stop
+            enabled = false;
         } else {
             out += .000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);  //PID + feedforward calculation
+            enabled = true;
         }
 
         out = Math.abs(out);
@@ -151,7 +162,8 @@ public class Shooter {
 
     private void shoot() {
         if (enabled) {
-            setWheelVoltage(out);
+            //setWheelVoltage(out);
+            setWheelVoltage(.80);
         } else {
             setWheelVoltage(0);
         }
