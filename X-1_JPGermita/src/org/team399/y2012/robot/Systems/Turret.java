@@ -5,6 +5,7 @@
 package org.team399.y2012.robot.Systems;
 
 import edu.wpi.first.wpilibj.CANJaguar;
+import org.team399.y2012.Utilities.EagleMath;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 import org.team399.y2012.Utilities.MovingAverage;
@@ -19,7 +20,7 @@ public class Turret {
     private CANJaguar m_turret;
     //private double p = -100, i = 0, d = -190, deadband = .25;
     public double positionRaw = 5.0;
-    private double errorTolerance = .075;
+    private double errorTolerance = .05;
     private PrintStream m_print = new PrintStream("[Turret] ");
     private MovingAverage actualFilter = new MovingAverage(10);
     private MovingAverage setFilter = new MovingAverage(8);
@@ -55,7 +56,11 @@ public class Turret {
      * @param angle in pot rotations
      */
     public void setAngle(double angle) {
+        
         positionRaw = setFilter.calculate(angle);
+        positionRaw *= 100;
+        positionRaw = Math.floor(positionRaw);
+        positionRaw /= 100;
         //System.out.println("Turret setAngle: " + angle);
         bangBangController();
     }
@@ -67,10 +72,11 @@ public class Turret {
 
     private void bangBangController() {
         double speed = .2;
+        
         try {
             if (Math.abs(getActualPosition() - positionRaw) > errorTolerance) {
                 if(Math.abs(getActualPosition() - positionRaw) > .5) {
-                    speed  = .7;
+                    speed  = .85;
                 }
                 
                 if (positionRaw > getActualPosition()) {
@@ -94,8 +100,11 @@ public class Turret {
      */
     public double getActualPosition() {
         try {
-            
-            return actualFilter.calculate(m_turret.getPosition());
+            double actual = actualFilter.calculate(m_turret.getPosition());
+            actual *= 100;
+            actual = Math.floor(actual);
+            actual /= 100;
+            return actual;
         } catch (Exception e) {
             e.printStackTrace();
         }

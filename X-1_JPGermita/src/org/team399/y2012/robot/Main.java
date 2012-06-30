@@ -27,7 +27,7 @@ public class Main extends IterativeRobot {
     Compressor comp = new Compressor(4, 1);
     Joystick leftJoy = new Joystick(1);
     Joystick rightJoy = new Joystick(2);
-    DriverStationUserInterface funbox = new DriverStationUserInterface();
+    public static DriverStationUserInterface funbox = new DriverStationUserInterface();
 
     /**
      * This function is run when the robot is first started up and should be
@@ -77,14 +77,17 @@ public class Main extends IterativeRobot {
                 rightPower = -rightJoy.getRawAxis(2);//-leftJoy.getRawAxis(4);
         boolean shift = leftJoy.getRawButton(1),
                 intake = rightJoy.getRawButton(1);
-
+//DROPPER
         bot.intake.setDropper(intake);
+//LOW Gear        
         if (leftJoy.getRawButton(2)) {
             bot.drive.tankDrive(-.4, .4);
             bot.drive.lowGear();
+//PID Brakes           
         } else if (rightJoy.getRawButton(2)) {
             bot.drive.PIDLock(true);
             System.out.println("BaseLocked!");
+//Drive            
         } else {
             bot.drive.iCantBelieveItsNotButterDrive(leftPower, -rightPower, shift);
             bot.drive.PIDLock(false);
@@ -138,9 +141,9 @@ public class Main extends IterativeRobot {
             bot.shooter.setVelocity(shooterSpeed);
 
             if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON)) {
-                bot.intake.setIntake(1.0);
+                bot.intake.setIntake(-intakeSpeed);
             } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON)) {
-                bot.intake.setIntake(-1.0);
+                bot.intake.setIntake(intakeSpeed);
             } else {
                 bot.intake.setIntake(0);
             }

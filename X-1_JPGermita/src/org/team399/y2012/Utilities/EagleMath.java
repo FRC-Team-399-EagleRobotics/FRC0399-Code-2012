@@ -4,6 +4,8 @@
  */
 package org.team399.y2012.Utilities;
 
+import com.sun.squawk.util.MathUtils;
+
 /**
  * Class of various math utilities.
  * @author robotics
@@ -53,5 +55,10 @@ public class EagleMath {
         } else {
             return 0;
         }
+    }
+    
+    public static double truncate(double value, double places) {
+        double multiplier = MathUtils.pow(10, places);
+        return Math.floor(multiplier*value) / multiplier;
     }
 }

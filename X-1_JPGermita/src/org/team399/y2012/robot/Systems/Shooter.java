@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.Solenoid;
 import org.team399.y2012.Utilities.MovingAverage;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
+import edu.wpi.first.wpilibj.Dashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * This class encapsulates the two motors and pneumatic actuator
@@ -17,20 +19,20 @@ import org.team399.y2012.robot.Config.RobotIOMap;
  */
 public class Shooter {
 
+    Dashboard pidDash = DriverStation.getInstance().getDashboardPackerLow();
     private CANJaguar m_shooterA = null;
     private CANJaguar m_shooterB = null;
     private Solenoid m_hood = null;
     private PrintStream m_print = new PrintStream("[SHOOTER] ");
-    private MovingAverage velFilt = new MovingAverage(10);
-    
+    private MovingAverage velFilt = new MovingAverage(5);
     /*************************************
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
      */
-    private double kP = 5, //Velocity PID Proportional gain
-            kI = 5, //V-PID Integral gain
-            kD = 8, //V-PID differential gain
-            kF = .2;        //V-PID feed forward gain
+    private double kP = 17, //Velocity PID Proportional gain
+            kI = 1, //V-PID Integral gain
+            kD = .4, //V-PID differential gain
+            kF = 0;        //V-PID feed forward gain
 
     /**
      * Constructor
@@ -44,7 +46,7 @@ public class Shooter {
 
             //Encoder enabled shooter jag setup: MUST FOLLOW THIS SEQUENCE OR ENCODER OR MOTOR WILL NOT WORK
             m_shooterA = new CANJaguar(RobotIOMap.SHOOTER_A_ID);                //Initialize jaguar
-            m_shooterA.setVoltageRampRate(56);                                  //Voltage ramp rate to prevent high current spikes
+            m_shooterA.setVoltageRampRate(36);                                  //Voltage ramp rate to prevent high current spikes
             m_shooterA.configNeutralMode(CANJaguar.NeutralMode.kCoast);         //Put motor into coast mode to lower amount of sudden force on mechanism
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);   //Change mode to percent vbus
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPosition);      //Change mode to position mode
@@ -62,7 +64,7 @@ public class Shooter {
             m_shooterB = new CANJaguar(RobotIOMap.SHOOTER_B_ID);
             m_shooterB.configNeutralMode(CANJaguar.NeutralMode.kCoast);
             m_shooterB.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
-            m_shooterB.setVoltageRampRate(56);
+            m_shooterB.setVoltageRampRate(36);
             m_shooterA.configFaultTime(.5);
         } catch (Exception e) {
             System.err.println("[SHOOTER-B]Error initializing");
@@ -82,18 +84,19 @@ public class Shooter {
         try {
             prevPos = pos;
             pos = m_shooterA.getPosition();
-
+            //System.out.println("Shooter Pos: " + pos);
             double time = System.currentTimeMillis();
 
-            
-            double newVel = (pos - prevPos) / (((time - prevT)*(.0000166666666))); //Velocity is change in position divided by change in unit time, converted to minutes
+            double newVel = (pos - prevPos) / (((time - prevT) * (.0000166666666))); //Velocity is change in position divided by change in unit time, converted to minutes
             prevT = time;
             //vel = vel * a + (1 - a) * newVel; // Filter algorithm. Tune a up for more filter
-            vel = velFilt.calculate(newVel)/2;
-            if (Math.abs(vel * scalar) < 50) {
-                return 0;
-            }
-            System.out.println("Velocity: " + vel);
+            vel = velFilt.calculate(newVel);///2;
+            vel /= 2;
+//            if (Math.abs(vel * scalar) < 50) {
+//                return 0;
+//            }
+
+
             return vel; //* scalar;              //Scales value to reasonable values
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,6 +113,7 @@ public class Shooter {
      * @param velocity Velocity in meters per second
      */
     public void setVelocity(double velocity) {
+        velocity = Math.floor(velocity);
         setPointV = velocity;
     }
     double out = 0;
@@ -129,9 +133,11 @@ public class Shooter {
      * @param K Feed forward scalar value. This value varies based on the setpoint. may not be linear. 
      */
     public void update(double P, double I, double D, double K) {
+
         prevPrevErr = prevErr;
         prevErr = err;
-        err = setPointV - getEncoderRate();
+        err = setPointV - Math.abs(getEncoderRate());
+
 //        try {
 //            if (Math.abs(err) > 1000) {
 //                m_shooterA.setVoltageRampRate(56);
@@ -143,11 +149,15 @@ public class Shooter {
 //        } catch (Exception e) {
 //        }
 
-        if (setPointV < 200) {   //Set some deadband on velocity control
-            out = 0;            //If commanded a very low speed, coast to a stop
+        //Set some deadband on velocity control
+        if (setPointV < 200) {
+            //If commanded a very low speed, coast to a stop    
+            out = 0;
             enabled = false;
+
+            //PID + feedforward calculation    
         } else {
-            out += .000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);  //PID + feedforward calculation
+            out += .000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);
             enabled = true;
         }
 
@@ -157,13 +167,21 @@ public class Shooter {
             out = 1;
         }
 
+        pidDash.addDouble(setPointV);
+        pidDash.addDouble(vel);
+        pidDash.addDouble(out);
+        pidDash.addDouble(P * (err - prevErr));
+        pidDash.addDouble(I * err);
+        pidDash.addDouble(D * (err - 2 * prevErr + prevPrevErr));
+        pidDash.addDouble(K * setPointV);
+        pidDash.addDouble(err);
+        pidDash.commit();
         shoot();
     }
 
     private void shoot() {
         if (enabled) {
-            //setWheelVoltage(out);
-            setWheelVoltage(.80);
+            setWheelVoltage(out);
         } else {
             setWheelVoltage(0);
         }
