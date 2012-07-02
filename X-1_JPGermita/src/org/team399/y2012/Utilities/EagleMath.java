@@ -61,4 +61,11 @@ public class EagleMath {
         double multiplier = MathUtils.pow(10, places);
         return Math.floor(multiplier*value) / multiplier;
     }
+    
+    public static double fMod(double value, double x) {
+        // Negate if and only if base is negative.
+        // (Java's modulo isn't mathematically pretty in this way.)
+        double sign = (value < 0) ? -1 : 1;
+        return sign * (Math.abs(x) % Math.abs(value));
+    }
 }

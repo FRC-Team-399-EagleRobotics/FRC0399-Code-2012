@@ -28,6 +28,7 @@ public class Main extends IterativeRobot {
     Joystick leftJoy = new Joystick(1);
     Joystick rightJoy = new Joystick(2);
     public static DriverStationUserInterface funbox = new DriverStationUserInterface();
+    
 
     /**
      * This function is run when the robot is first started up and should be
@@ -40,9 +41,7 @@ public class Main extends IterativeRobot {
     }
 
     public void disabledPeriodic() {
-        bot.eye.demoMode();
-//        System.out.println("Turret knob: " + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
-//        System.out.println("Scaled Knob: " + EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 10, (float) 0));
+//        bot.eye.demoMode();
     }
 
     public void autonomousInit() {

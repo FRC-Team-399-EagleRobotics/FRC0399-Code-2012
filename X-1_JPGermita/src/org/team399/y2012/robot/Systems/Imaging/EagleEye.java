@@ -5,7 +5,7 @@
 package org.team399.y2012.robot.Systems.Imaging;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import org.team399.y2012.Utilities.EagleMath;
+import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 import org.team399.y2012.robot.Systems.Imaging.ImageProcessor.Target;
 
@@ -19,6 +19,8 @@ public class EagleEye {
     public LightRing ring;
     public Camera cam;
     private Target[] targets;
+    
+    private PrintStream m_ps = new PrintStream("[EAGLE-EYE] ");
     //Color Thresholds
     Color[] colors = {
         Color.fromRGB(0, 1, 0), //Green color
@@ -64,8 +66,12 @@ public class EagleEye {
         loopCount++;
         if (cam.freshImage()) {
 
+            m_ps.println("Image Processing started...");
+            long procStartTime = System.currentTimeMillis();
             targets = ImageProcessor.processImage(cam.getImage(), thresholds[colorIndex]);    //Process image from camera using given thresholds
-
+            long timeElapsed = (System.currentTimeMillis() - procStartTime);
+            m_ps.println("Image processing complete!");
+            m_ps.println("Image Processing took " +  timeElapsed + " ms.");
             if (targets != null && targets.length > 0) {    //If targets are detected
 
                 targetsFound = true;                        //Set flag to true

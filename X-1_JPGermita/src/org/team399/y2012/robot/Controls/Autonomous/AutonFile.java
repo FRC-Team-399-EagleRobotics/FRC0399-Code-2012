@@ -39,7 +39,7 @@ public class AutonFile {
         } catch (Exception e) {
         }
 
-        String NL = "\n";
+        String NL = System.getProperty("line.separator");
         System.out.println("Read from file: ");
         String file = sb.toString();
         System.out.println(file);

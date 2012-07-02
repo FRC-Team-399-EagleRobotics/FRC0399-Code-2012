@@ -24,14 +24,16 @@ public class Shooter {
     private CANJaguar m_shooterB = null;
     private Solenoid m_hood = null;
     private PrintStream m_print = new PrintStream("[SHOOTER] ");
-    private MovingAverage velFilt = new MovingAverage(5);
+    private MovingAverage velFilt = new MovingAverage(8);
+    
+    private double DEFAULT_VRAMP_RATE = 48;
     /*************************************
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
      */
     private double kP = 17, //Velocity PID Proportional gain
-            kI = 1, //V-PID Integral gain
-            kD = .4, //V-PID differential gain
+            kI = 4, //V-PID Integral gain
+            kD = 6, //V-PID differential gain
             kF = 0;        //V-PID feed forward gain
 
     /**
@@ -46,7 +48,7 @@ public class Shooter {
 
             //Encoder enabled shooter jag setup: MUST FOLLOW THIS SEQUENCE OR ENCODER OR MOTOR WILL NOT WORK
             m_shooterA = new CANJaguar(RobotIOMap.SHOOTER_A_ID);                //Initialize jaguar
-            m_shooterA.setVoltageRampRate(36);                                  //Voltage ramp rate to prevent high current spikes
+            m_shooterA.setVoltageRampRate(DEFAULT_VRAMP_RATE);                                  //Voltage ramp rate to prevent high current spikes
             m_shooterA.configNeutralMode(CANJaguar.NeutralMode.kCoast);         //Put motor into coast mode to lower amount of sudden force on mechanism
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);   //Change mode to percent vbus
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPosition);      //Change mode to position mode
@@ -64,7 +66,7 @@ public class Shooter {
             m_shooterB = new CANJaguar(RobotIOMap.SHOOTER_B_ID);
             m_shooterB.configNeutralMode(CANJaguar.NeutralMode.kCoast);
             m_shooterB.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
-            m_shooterB.setVoltageRampRate(36);
+            m_shooterB.setVoltageRampRate(DEFAULT_VRAMP_RATE);
             m_shooterA.configFaultTime(.5);
         } catch (Exception e) {
             System.err.println("[SHOOTER-B]Error initializing");
@@ -92,10 +94,9 @@ public class Shooter {
             //vel = vel * a + (1 - a) * newVel; // Filter algorithm. Tune a up for more filter
             vel = velFilt.calculate(newVel);///2;
             vel /= 2;
-//            if (Math.abs(vel * scalar) < 50) {
-//                return 0;
-//            }
-
+            if (Math.abs(vel) < 50) {
+                vel = 0;
+            }
 
             return vel; //* scalar;              //Scales value to reasonable values
         } catch (Exception e) {
@@ -138,16 +139,16 @@ public class Shooter {
         prevErr = err;
         err = setPointV - Math.abs(getEncoderRate());
 
-//        try {
-//            if (Math.abs(err) > 1000) {
-//                m_shooterA.setVoltageRampRate(56);
-//                m_shooterB.setVoltageRampRate(56);
-//            } else {
-//                m_shooterA.setVoltageRampRate(24);
-//                m_shooterB.setVoltageRampRate(24);
-//            }
-//        } catch (Exception e) {
-//        }
+        try {
+            if (Math.abs(err) > 200) {
+                m_shooterA.setVoltageRampRate(DEFAULT_VRAMP_RATE);
+                m_shooterB.setVoltageRampRate(DEFAULT_VRAMP_RATE);
+            } else {
+                m_shooterA.setVoltageRampRate(DEFAULT_VRAMP_RATE/3);
+                m_shooterB.setVoltageRampRate(DEFAULT_VRAMP_RATE/3);
+            }
+        } catch (Exception e) {
+        }
 
         //Set some deadband on velocity control
         if (setPointV < 200) {
