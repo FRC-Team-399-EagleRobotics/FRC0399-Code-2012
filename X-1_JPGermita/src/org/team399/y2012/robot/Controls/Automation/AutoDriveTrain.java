@@ -33,6 +33,8 @@ public class AutoDriveTrain {
 
         throttle *= .6;
 
+        System.out.println("Autobalancing...");
+        System.out.println("Pitch: " + pitch);
         if (Math.abs(pitch) < 15) {
             pitch = 0;         //Threshold for pitch. Prevents tiny movements that spoil balances
             m_drive.PIDLock(true);

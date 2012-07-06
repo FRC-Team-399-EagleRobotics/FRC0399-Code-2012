@@ -4,7 +4,7 @@
  */
 package org.team399.y2012.robot.Controls.Autonomous;
 
-import java.io.InputStream;
+import org.team399.y2012.Utilities.FileReader;
 import org.team399.y2012.Utilities.StringUtils;
 
 /**
@@ -15,6 +15,7 @@ public class AutonFile {
 
     private String m_filename;
     private String[][] parsedFile;
+    FileReader fr;
 
     /**
      * Constructor
@@ -22,6 +23,7 @@ public class AutonFile {
      */
     public AutonFile(String filename) {
         this.m_filename = filename;
+        fr = new FileReader(m_filename);
         read();
     }
 
@@ -29,21 +31,14 @@ public class AutonFile {
      * Reads the file into memory
      */
     private void read() {
-        InputStream is = getClass().getResourceAsStream(m_filename);
-        StringBuffer sb = new StringBuffer();
-        try {
-            int chars = is.read();
-            while (is.read() != -1) {
-                sb.append((char) chars);
-            }
-        } catch (Exception e) {
-        }
+        
 
         String NL = System.getProperty("line.separator");
         System.out.println("Read from file: ");
-        String file = sb.toString();
-        System.out.println(file);
-        String[] lines = StringUtils.split(file, NL);
+        String[] lines = fr.getContents();
+        for(int i = 0; i < lines.length; i++) {
+            System.out.println(lines[i]);
+        }
         String[][] elements = new String[lines.length][];
 
         System.out.println("Lines Parsed: " + lines.length);

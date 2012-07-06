@@ -38,6 +38,7 @@ public class Main extends IterativeRobot {
         bot = new Robot();
         comp.start();
         bot.shooter.setEnabled(true);
+        //auton = new AutonFile("file:///testAuton.txt");
     }
 
     public void disabledPeriodic() {
@@ -45,8 +46,7 @@ public class Main extends IterativeRobot {
     }
 
     public void autonomousInit() {
-        auton = new AutonFile("file:///testAuton.txt");
-        ai = new AutonInterpreter(auton.getParsedFile());
+        //ai = new AutonInterpreter(auton.getParsedFile());
     }
 
     /**
@@ -55,7 +55,6 @@ public class Main extends IterativeRobot {
     public void autonomousPeriodic() {
         bot.run();
         ai.run();
-
     }
 
     /**
@@ -87,7 +86,9 @@ public class Main extends IterativeRobot {
             bot.drive.PIDLock(true);
             System.out.println("BaseLocked!");
 //Drive            
-        } else {
+        } else if(rightJoy.getRawButton(3)) {
+            bot.adt.autoBalance(rightPower);
+        }else {
             bot.drive.iCantBelieveItsNotButterDrive(leftPower, -rightPower, shift);
             bot.drive.PIDLock(false);
         }
@@ -101,7 +102,7 @@ public class Main extends IterativeRobot {
         boolean autoShoot = funbox.getShooterSwitch().equals("AUTO")
                 && funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON),
                 autoSpeed = false,
-                autoAimLock = false,
+                autoAimLock = false,//funbox.getDigital(DriverStationUserInterface.PORTS.TURRET_SWITCH_AUTO),
                 autoAimLFend = false,
                 autoAimRFend = false,
                 autoAimKey = false;

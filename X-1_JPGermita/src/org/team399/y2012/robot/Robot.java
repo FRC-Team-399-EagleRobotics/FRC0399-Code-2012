@@ -8,6 +8,7 @@ import org.team399.y2012.Utilities.DsLcdStream;
 import org.team399.y2012.Utilities.EagleMath;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Controls.Automation.AutoAimController;
+import org.team399.y2012.robot.Controls.Automation.AutoDriveTrain;
 import org.team399.y2012.robot.Controls.Automation.AutoShootController;
 import org.team399.y2012.robot.Controls.Automation.AutoShooterSpeedController;
 import org.team399.y2012.robot.Controls.HumanInterfaceDevices.DriverStationUserInterface;
@@ -29,6 +30,7 @@ public class Robot {
     public AutoShootController shootController;
     public AutoShooterSpeedController shooterSpeedController;
     public AutoAimController aic;
+    public AutoDriveTrain adt;
 
     /**
      * Constructor. Insert any other initialization commands here
@@ -50,6 +52,7 @@ public class Robot {
         ps_bot.println("Systems Initialized");
         shooterSpeedController = new AutoShooterSpeedController();
         shootController = new AutoShootController(shooter, intake, shooterSpeedController);
+        adt = new AutoDriveTrain(drive);
         aic = new AutoAimController(turret, eye);
         ps_bot.println("Auto controllers initialized");
 //        ps_bot.println("Excecuting garbage collection...");
@@ -70,6 +73,8 @@ public class Robot {
 
         ps_bot.println("Initialization took " + ((double) initStartTime) / 1000 + " seconds!");
         DsLcdStream.printlnMain("Init done! Took " + ((double) initStartTime) / 1000 + " seconds!");
+        //eye.start();
+        
     }
 
     /**
@@ -78,10 +83,14 @@ public class Robot {
      */
     public void run() {
         shooter.update();
-        DsLcdStream.println1("ShooterKnob: " + (EagleMath.map((float) Main.funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
-                (float) 1.75, (float) 5.0, (float) 500, (float) 3500)) + "          ");
-        DsLcdStream.println2("Shooter Act: " + shooter.getEncoderRate() + "          ");
-        DsLcdStream.println3("Turret Set: " + turret.positionRaw + "          ");
-        DsLcdStream.println4("Turret Act: " + turret.getActualPosition() + "          ");
+        //eye.run();
+        //eye.run();
+//        DsLcdStream.println1("ShooterKnob: " + (EagleMath.map((float) Main.funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
+//                (float) 1.75, (float) 5.0, (float) 500, (float) 3500)) + "          ");
+//        DsLcdStream.println2("Shooter Act: " + shooter.getEncoderRate() + "          ");
+        DsLcdStream.println1("Targets found: " + eye.getNumberOfTargets() + "          ");
+        //DsLcdStream.println2("Sizeof tallest target: " + eye.getTallestTarget().area + "          ");
+//        DsLcdStream.println3("Turret Set: " + turret.positionRaw + "          ");
+//        DsLcdStream.println4("Turret Act: " + turret.getActualPosition() + "          ");
     }
 }

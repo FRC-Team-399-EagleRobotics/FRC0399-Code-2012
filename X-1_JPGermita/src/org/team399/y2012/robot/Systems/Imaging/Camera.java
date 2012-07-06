@@ -20,7 +20,7 @@ public class Camera {
      */
     public Camera() {
         try {
-            //camera = AxisCamera.getInstance();
+            camera = AxisCamera.getInstance();
         } catch (Exception e) {
             System.err.println("[CAMERA]Error initializing");
             e.printStackTrace();

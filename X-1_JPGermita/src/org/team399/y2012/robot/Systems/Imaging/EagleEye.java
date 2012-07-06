@@ -5,17 +5,19 @@
 package org.team399.y2012.robot.Systems.Imaging;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Relay;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 import org.team399.y2012.robot.Systems.Imaging.ImageProcessor.Target;
+
 
 /**
  * Eagle Eye class. Encapsulates camera, ImageTracker, and the RGB light ring into one class.
  * @author Jeremy Germita, Justin S. Jackie P.
  * 
  */
-public class EagleEye {
-
+public class EagleEye extends Thread{
+    private Relay greenRing = new Relay(8);
     public LightRing ring;
     public Camera cam;
     private Target[] targets;
@@ -47,7 +49,10 @@ public class EagleEye {
         } else if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kInvalid)) {
             ring.setRGB(0, 1, 0);
         }
-        //ring.setRGB(0, 1, 0);
+        for(double c = 0.0; c < 1.0; c+=.01) {
+            ring.setRGB(0, c, 1.0-c);
+        }
+        greenRing.set(Relay.Value.kForward);
         System.out.println("[EAGLE-EYE] Eagle Eye initialized");
     }
     int colorCount = 0;
@@ -68,7 +73,7 @@ public class EagleEye {
 
             m_ps.println("Image Processing started...");
             long procStartTime = System.currentTimeMillis();
-            targets = ImageProcessor.processImage(cam.getImage(), thresholds[colorIndex]);    //Process image from camera using given thresholds
+            targets = ImageProcessor.processImage(cam.getImage(), thresholds[0]);    //Process image from camera using given thresholds
             long timeElapsed = (System.currentTimeMillis() - procStartTime);
             m_ps.println("Image processing complete!");
             m_ps.println("Image Processing took " +  timeElapsed + " ms.");
@@ -79,11 +84,19 @@ public class EagleEye {
                 timeLastTarget = System.currentTimeMillis();
             } else {
                 targetsFound = false;
-                if ((System.currentTimeMillis()- timeLastTarget) % 5000 < 4950) {
-                    colorIndex++;
-                    colorIndex = (colorIndex > colors.length) ? 0 : colorIndex;
-                }
+//                if ((System.currentTimeMillis()- timeLastTarget) % 5000 < 4950) {
+//                    colorIndex++;
+//                    colorIndex = (colorIndex > colors.length) ? 0 : colorIndex;
+//                }
             }
+        }
+    }
+    
+    public int getNumberOfTargets() {
+        try {
+            return getTargets().length;
+        } catch (Exception e) {
+            return 0;
         }
     }
 

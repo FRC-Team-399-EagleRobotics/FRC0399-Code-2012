@@ -10,7 +10,6 @@ import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 import org.team399.y2012.Utilities.MovingAverage;
 
-
 /**
  *
  * @author Jeremy
@@ -22,8 +21,8 @@ public class Turret {
     public double positionRaw = 5.0;
     private double errorTolerance = .05;
     private PrintStream m_print = new PrintStream("[Turret] ");
-    private MovingAverage actualFilter = new MovingAverage(10);
-    private MovingAverage setFilter = new MovingAverage(8);
+    private MovingAverage actualFilter = new MovingAverage(4);
+    private MovingAverage setFilter = new MovingAverage(4);
 
     /**
      * Constructor.
@@ -46,7 +45,7 @@ public class Turret {
             e.printStackTrace();
         }
         m_print.println("Turret Initialization complete!");
-        for(int i = 0; i < 9; i++) {
+        for (int i = 0; i < 9; i++) {
             setFilter.calculate(positionRaw);
         }
     }
@@ -56,7 +55,7 @@ public class Turret {
      * @param angle in pot rotations
      */
     public void setAngle(double angle) {
-        
+
         positionRaw = setFilter.calculate(angle);
         positionRaw *= 100;
         positionRaw = Math.floor(positionRaw);
@@ -64,31 +63,54 @@ public class Turret {
         //System.out.println("Turret setAngle: " + angle);
         bangBangController();
     }
-    
+
     public void setAngleDeg(double angle) {
-        double rotationsPerDegrees = .023888888888888888888888888888888;
-        setAngle(angle*rotationsPerDegrees+5.0);
+        double rotationsPerDegrees = 4.3 / 180;
+        setAngle(angle * rotationsPerDegrees + 5.0);
     }
 
+    public boolean isAtAngle() {
+        return Math.abs(getActualPosition() - positionRaw) > errorTolerance;
+    }
+    double prevError = 0, error = 0;
+
     private void bangBangController() {
-        double speed = .2;
-        
+        double speed = .85;
+        double kP = 1.0, kD = 0.0;
+
+        prevError = error;
+        error = getActualPosition() - positionRaw;
         try {
-            if (Math.abs(getActualPosition() - positionRaw) > errorTolerance) {
-                if(Math.abs(getActualPosition() - positionRaw) > .5) {
-                    speed  = .85;
-                }
-                
-                if (positionRaw > getActualPosition()) {
-                    m_turret.setX(-speed);
-                } else if (positionRaw < getActualPosition()) {
+            if (Math.abs(error) > errorTolerance) {
+                if (Math.abs(error) < .5) {
+                    //speed = .15;
+                    speed = (kP*error) - (kD * (error - prevError));
+
                     m_turret.setX(speed);
                 } else {
-                    m_turret.setX(0);
+//                    if (positionRaw > getActualPosition()) {
+//                        m_turret.setX(-speed);
+//                    } else if (positionRaw < getActualPosition()) {
+//                        m_turret.setX(speed);
+//                    } else {
+//                        m_turret.setX(0);
+//                    }
+                    
+                    kP = 5.0;
                 }
+                System.out.println("Turret Speed: " + speed);
+                System.out.println("Turret error: " + error);
             } else {
                 m_turret.setX(0);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setV(double value) {
+        try {
+            m_turret.setX(value);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -4,8 +4,9 @@
  */
 package org.team399.y2012.Utilities;
 
-import java.io.InputStreamReader;
-import java.io.Reader;
+import com.sun.squawk.microedition.io.FileConnection;
+import java.io.DataInputStream;
+import javax.microedition.io.Connector;
 
 /**
  * Class used to provide functionality for reading files
@@ -14,7 +15,7 @@ import java.io.Reader;
 public class FileReader {
 
     private String m_filename;
-    private String[] m_lines;
+    private String[] m_lines = {"foo", "bar"};
     private static final char NEW_LINE = '\n';
 
     /**
@@ -31,21 +32,47 @@ public class FileReader {
      */
     private void read() {
 
-        Reader in = new InputStreamReader(getClass().getResourceAsStream(m_filename));
-        StringBuffer temp = new StringBuffer(1024);
-        char[] buffer = new char[1024];
-        int read;
+        DataInputStream theFile = null;
+        FileConnection fc = null;
+
         try {
-            while ((read = in.read(buffer, 0, buffer.length)) != -1) {
-                temp.append(buffer, 0, read);
-            }
-        } catch (Exception e) {
-            System.out.println("WARNING: Error reading configuration file! ");
+            fc = (FileConnection) Connector.open(m_filename, Connector.READ);
+            theFile = fc.openDataInputStream();
+        } catch (Exception ex) {
+            System.out.println("failed to open data input stream");
+        }
+        if(theFile == null) {
+            System.out.println("File DataInputStream null!");
         }
 
+        String file = null;
+        if (fc != null) {
+            System.out.println("File Reading now!");
+            try {
+                file = theFile.readUTF();
 
-        m_lines = StringUtils.split(temp.toString(), System.getProperty("line.separator"));
+            } catch (Exception ex) {
+                System.out.println("null pointer on file read " + m_filename);
+            }
+            try {
+                fc.close();
+            } catch (Exception ex) {
+                System.out.println("failed to close file " + m_filename);
+            }
+//        Reader in = new InputStreamReader(getClass().getResourceAsStream(m_filename));
+//        StringBuffer temp = new StringBuffer(2048);
+//        char[] buffer = new char[2048];
+//        int read;
+//        try {
+//            while ((read = in.read(buffer, 0, buffer.length)) != -1) {
+//                temp.append(buffer, 0, read);
+//            }
+//        } catch (Exception e) {
+//            System.out.println("WARNING: Error reading configuration file! ");
+//        }
 
+            m_lines = StringUtils.split(file, System.getProperty("line.separator"));
+        }
     }
 
     /**

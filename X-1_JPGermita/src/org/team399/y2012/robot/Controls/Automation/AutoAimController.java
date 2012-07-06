@@ -4,7 +4,6 @@
  */
 package org.team399.y2012.robot.Controls.Automation;
 
-import com.sun.squawk.util.MathUtils;
 import org.team399.y2012.robot.Systems.Imaging.EagleEye;
 import org.team399.y2012.robot.Systems.Turret;
 
@@ -32,15 +31,17 @@ public class AutoAimController {
      */
     public void lockOn() {
         //DO WORK HERE
-        if (System.currentTimeMillis() % 100 < 5) {      //Put on a .1 second timer to reduce noise in tracking
-//            if (m_turret.isAtAngle() && m_eye.foundTarget()) {    //Check to see if turret is still trying to go to a set position
-//                double targetDistance = m_eye.getTallestTarget().distance;  //Get distance in inches
-//                double xErr = 240 - m_eye.getTallestTarget().x;             //Target's distance from the center of view
-//
-//                double angle = MathUtils.asin(xErr / targetDistance);
-//                m_turret.setAngle(m_turret.getSetPosition()-angle);
-//            }
+        //if (System.currentTimeMillis() % 100 < 5) {      //Put on a .1 second timer to reduce noise in tracking
+        if (m_turret.isAtAngle() && m_eye.foundTarget()) {    //Check to see if turret is still trying to go to a set position
+            System.out.println("AutoLocking!");
+            double targetDistance = m_eye.getTallestTarget().distance;  //Get distance in inches
+            double xErr = 240 - m_eye.getTallestTarget().x;             //Target's distance from the center of view
+            System.out.println("Power: " + xErr * .0025);
+            m_turret.setV(xErr * .0025);
+        } else {
+            m_turret.setV(0);
         }
+        //}
     }
 
     /**
@@ -70,12 +71,11 @@ public class AutoAimController {
     public void rightFender() {
         setAndLock(-40);
     }
-    
+
     public void rLeftFender() {
-        
     }
+
     public void rRightFender() {
-        
     }
 
     /**
@@ -83,11 +83,11 @@ public class AutoAimController {
      * constantly pointed in a direction
      * @param angle The robot drivetrain's angle
      */
-    public void virtualFourBar(double angle)  {
-        double setAngle = (angle - 90)/360;    //Some fancy scaling math to get the drivetrain angle to be  a usable angle for the turret
+    public void virtualFourBar(double angle) {
+        double setAngle = (angle - 90) / 360;    //Some fancy scaling math to get the drivetrain angle to be  a usable angle for the turret
         setAndLock(angle);
     }
-    
+
     private void setAndLock(double angle) {
 //        if (m_turret.isAtAngle() && Math.abs(m_turret.getSetPosition() - angle) > .5) {
 //            lockOn();
@@ -96,6 +96,4 @@ public class AutoAimController {
 //        }
         m_turret.setAngleDeg(angle);
     }
-    
-   
 }

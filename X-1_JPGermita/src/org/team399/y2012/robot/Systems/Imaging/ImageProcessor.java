@@ -126,17 +126,17 @@ public class ImageProcessor {
         /**
          * The target's height
          */
-        public int height;
+        public int height = 0;
         
         /**
          * The target's calculated straight line distance from the camera lens
          */
-        public double distance;
+        public double distance = 0;
         
         /**
          * The target's area in the image
          */
-        public double area;
+        public double area = 0;
 
         /**
          * Creates a target based on a particle analysis report

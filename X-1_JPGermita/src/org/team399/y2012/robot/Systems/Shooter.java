@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
  * involved in operating the shooter. Provides the bare essentials for running the shooter.
  * @author Jeremy Germita
  */
-public class Shooter {
+public class Shooter extends Thread {
 
     Dashboard pidDash = DriverStation.getInstance().getDashboardPackerLow();
     private CANJaguar m_shooterA = null;
@@ -25,7 +25,6 @@ public class Shooter {
     private Solenoid m_hood = null;
     private PrintStream m_print = new PrintStream("[SHOOTER] ");
     private MovingAverage velFilt = new MovingAverage(8);
-    
     private double DEFAULT_VRAMP_RATE = 48;
     /*************************************
      * SHOOTER PID CONSTANTS ARE HERE:
@@ -144,8 +143,8 @@ public class Shooter {
                 m_shooterA.setVoltageRampRate(DEFAULT_VRAMP_RATE);
                 m_shooterB.setVoltageRampRate(DEFAULT_VRAMP_RATE);
             } else {
-                m_shooterA.setVoltageRampRate(DEFAULT_VRAMP_RATE/3);
-                m_shooterB.setVoltageRampRate(DEFAULT_VRAMP_RATE/3);
+                m_shooterA.setVoltageRampRate(DEFAULT_VRAMP_RATE / 3);
+                m_shooterB.setVoltageRampRate(DEFAULT_VRAMP_RATE / 3);
             }
         } catch (Exception e) {
         }
@@ -155,8 +154,6 @@ public class Shooter {
             //If commanded a very low speed, coast to a stop    
             out = 0;
             enabled = false;
-
-            //PID + feedforward calculation    
         } else {
             out += .000025 * (P * (err - prevErr) + I * err + D * (err - 2 * prevErr + prevPrevErr) + K * setPointV);
             enabled = true;

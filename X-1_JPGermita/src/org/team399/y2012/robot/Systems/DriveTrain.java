@@ -7,6 +7,7 @@ package org.team399.y2012.robot.Systems;
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
+import org.team399.y2012.Utilities.MovingAverage;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.Utilities.RateLimitFilter;
 import org.team399.y2012.robot.Config.RobotIOMap;
@@ -25,8 +26,8 @@ public class DriveTrain {
     private Solenoid shifter = null;
     private Gyro yaw = new Gyro(RobotIOMap.GYRO_YAW);
     private Gyro pitch = new Gyro(RobotIOMap.GYRO_PITCH);
-    private RateLimitFilter m_pitchFilter = new RateLimitFilter(.1);    //Rate limit filters to help filter out noise
-    private RateLimitFilter m_yawFilter = new RateLimitFilter(.1);      //from gyro readings
+    private MovingAverage m_pitchFilter = new MovingAverage(8);
+    private RateLimitFilter m_yawFilter = new RateLimitFilter(.1);
     private PrintStream ps_drive = new PrintStream("[DRIVE] ");
 
     /**
@@ -91,6 +92,7 @@ public class DriveTrain {
         ps_drive.println("CAN Jaguar initialization complete");
         yaw.reset();
         pitch.reset();
+        
         ps_drive.println("Gyro initialization complete");
         ps_drive.println("Drivetrain initialization complete!");
     }
@@ -233,7 +235,7 @@ public class DriveTrain {
         double throttle = twoStickToThrottle(left, right);	//convert two stick commands to arcade throttle
         double turning = twoStickToTurning(left, right);	//convert two stick commands to arcade turning
 
-        double e_tSens = .65;								//scalar value for turning desensitivity
+        double e_tSens = 1;								//scalar value for turning desensitivity
         double tLim = (1.2 - Math.abs(throttle)) * e_tSens;	//Turn limiting scalar, based on throttle
 
         if (!gear) {			//High gear
@@ -301,9 +303,7 @@ public class DriveTrain {
     public double getPitch() {
         double pitchVal = pitch.getAngle();
 
-        m_pitchFilter.update(pitchVal);
-
-        return m_pitchFilter.get();
+        return m_pitchFilter.calculate(pitchVal);
     }
 
     /**
