@@ -35,7 +35,6 @@ public class ShootTwoBalls {
         double conveystart = 2.5;       //start the roller to shoot
         double stopshoot = 4.5;         //stop shooting balls
         
-        double turretposition = Main.bot.turret.getActualPosition();
         
         // Set shooter                                
         Main.bot.shooter.update();                                
@@ -46,7 +45,7 @@ public class ShootTwoBalls {
      
         
         //grab current turret postion and hold it!
-         Main.bot.turret.setAngle(turretposition);
+         Main.bot.turret.setV(0);
         
         //added to prevent conveyor from fighting itself!
         //stop conveyor for to delay to let the shooter stop

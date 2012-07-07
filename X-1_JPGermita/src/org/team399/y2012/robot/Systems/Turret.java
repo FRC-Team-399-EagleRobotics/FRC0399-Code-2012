@@ -19,10 +19,10 @@ public class Turret {
     private CANJaguar m_turret;
     //private double p = -100.0, i = 0.0, d = -1.7, deadband = .25;
     public double positionRaw = 5.0;
-    private double errorTolerance = .03;
+    private double errorTolerance = .05;
     private PrintStream m_print = new PrintStream("[Turret] ");
-    private MovingAverage actualFilter = new MovingAverage(4);
-    private MovingAverage setFilter = new MovingAverage(4);
+    private MovingAverage actualFilter = new MovingAverage(2);
+    private MovingAverage setFilter = new MovingAverage(1);
 
     /**
      * Constructor.
@@ -88,25 +88,18 @@ public class Turret {
 
     private void bangBangController() {
         double speed = .85;
-        double kP = 1.3, kD = 0.1;
+        double kP = 1.0, kD = 0;
 
         prevError = error;
         error = getActualPosition() - positionRaw;
         try {
             if (Math.abs(error) > errorTolerance) {
-                if (Math.abs(error) < .5) {
+                if (Math.abs(error) > 0 ) {
                     //speed = .15;
                     speed = (kP*error) - (kD * (error - prevError));
 
                     m_turret.setX(speed);
                 } else {
-//                    if (positionRaw > getActualPosition()) {
-//                        m_turret.setX(-speed);
-//                    } else if (positionRaw < getActualPosition()) {
-//                        m_turret.setX(speed);
-//                    } else {
-//                        m_turret.setX(0);
-//                    }
                     kP = 2.0;
                     kD = .2;
                     

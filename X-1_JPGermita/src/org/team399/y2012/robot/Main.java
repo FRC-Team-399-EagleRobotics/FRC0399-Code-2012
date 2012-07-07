@@ -46,7 +46,7 @@ public class Main extends IterativeRobot {
 //        bot.eye.demoMode();
         
         System.out.println("FB Scaled:" + EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0)); 
-        System.out.println("FB Knob:" + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
+        //System.out.println("FB Knob:" + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
         System.out.println("Robot Pot: " + bot.turret.getActualPosition());
         
         if (EagleMath.isInBand(funbox.getAnalog(DriverStationUserInterface.PORTS.AUTON_KNOB), 0.1, 2.0)) {
@@ -195,6 +195,8 @@ public class Main extends IterativeRobot {
             bot.aic.rightFender();
         } else if (autoAimKey) {
             bot.aic.virtualFourBar(bot.drive.getAngleWraparound());
+        } else if (funbox.getDigital(DriverStationUserInterface.PORTS.TURRET_SWITCH_OFF)){
+            bot.turret.setV(0);
         }
 
         if (shoot) {

@@ -40,7 +40,6 @@ public class ShootTwoBallsBridge {
         double convStop = 11.5;
         double stop = 13.1;             //stop time
         
-        double turretposition = Main.bot.turret.getActualPosition();
         boolean intake = true;
         //shift to low
         Main.bot.drive.lowGear();                            
@@ -56,7 +55,7 @@ public class ShootTwoBallsBridge {
         Main.bot.shooter.setHood(true);
         
         //grab current turret postion and hold it!
-        Main.bot.turret.setAngle(turretposition);
+        Main.bot.turret.setV(0);
         
         //added to prevent conveyor from fighting itself!
         //stop conveyor for to delay to let the shooter stop

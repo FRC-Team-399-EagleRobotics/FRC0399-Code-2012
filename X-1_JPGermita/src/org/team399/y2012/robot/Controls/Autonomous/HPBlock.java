@@ -41,8 +41,7 @@ public class HPBlock {
         double forward = 11.5; 
         double stop = 13.5;
         
-        double turretposition = Main.bot.turret.getActualPosition();
-        
+       
         //move that shooter
         Main.bot.shooter.update();                                
         Main.bot.shooter.setVelocity(RPM);  
@@ -54,7 +53,7 @@ public class HPBlock {
         Main.bot.drive.lowGear();
         
         //grab current turret postion and hold it!
-        Main.bot.turret.setAngle(turretposition);
+        Main.bot.turret.setV(0);
         
         //added to prevent conveyor from fighting itself!
         //stop conveyor for to delay to let the shooter stop
