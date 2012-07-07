@@ -30,10 +30,11 @@ public class Shooter extends Thread {
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
      */
-    private double kP = 17, //Velocity PID Proportional gain
-            kI = 4, //V-PID Integral gain
-            kD = 6, //V-PID differential gain
-            kF = 0;        //V-PID feed forward gain
+    private double 
+            kP = 17,    //Velocity PID Proportional gain
+            kI = 2.3,   //V-PID Integral gain
+            kD = 6,     //V-PID differential gain
+            kF = 0;     //V-PID feed forward gain
 
     /**
      * Constructor
@@ -47,7 +48,7 @@ public class Shooter extends Thread {
 
             //Encoder enabled shooter jag setup: MUST FOLLOW THIS SEQUENCE OR ENCODER OR MOTOR WILL NOT WORK
             m_shooterA = new CANJaguar(RobotIOMap.SHOOTER_A_ID);                //Initialize jaguar
-            m_shooterA.setVoltageRampRate(DEFAULT_VRAMP_RATE);                                  //Voltage ramp rate to prevent high current spikes
+            m_shooterA.setVoltageRampRate(DEFAULT_VRAMP_RATE);                  //Voltage ramp rate to prevent high current spikes
             m_shooterA.configNeutralMode(CANJaguar.NeutralMode.kCoast);         //Put motor into coast mode to lower amount of sudden force on mechanism
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);   //Change mode to percent vbus
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPosition);      //Change mode to position mode
@@ -87,8 +88,9 @@ public class Shooter extends Thread {
             pos = m_shooterA.getPosition();
             //System.out.println("Shooter Pos: " + pos);
             double time = System.currentTimeMillis();
-
-            double newVel = (pos - prevPos) / (((time - prevT) * (.0000166666666))); //Velocity is change in position divided by change in unit time, converted to minutes
+            
+            //Velocity is change in position divided by change in unit time, converted to minutes
+            double newVel = (pos - prevPos) / (((time - prevT) * (.0000166666666))); 
             prevT = time;
             //vel = vel * a + (1 - a) * newVel; // Filter algorithm. Tune a up for more filter
             vel = velFilt.calculate(newVel);///2;
@@ -119,7 +121,7 @@ public class Shooter extends Thread {
     double out = 0;
 
     /**
-     * Updates the PID controller using preconfigured values.
+     * Updates the PID controller using pre-configured values.
      */
     public void update() {
         update(kP, kI, kD, kF);    //Update shooter PID controller

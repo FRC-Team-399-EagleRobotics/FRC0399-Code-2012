@@ -18,10 +18,16 @@ public class DriverStationUserInterface {
     private boolean fault = false;
 
     public static class PORTS {
-
-        public static final int SHOOT_BUTTON = 4;           //Red button
-        public static final int INTAKE_BELT_BUTTON = 2;     //BLUE
-        public static final int RELEASE_BELT_BUTTON = 6;    //WHITE
+       
+        //Red button
+        public static final int SHOOT_BUTTON = 4; 
+        
+        //Blue button
+        public static final int INTAKE_BELT_BUTTON = 2;    
+        
+        //White button
+        public static final int RELEASE_BELT_BUTTON = 6; 
+        
         public static final int SHOOTER_KNOB = 2;           
         public static final int HOOD_KNOB = 6;
         public static final int TURRET_KNOB = 7;

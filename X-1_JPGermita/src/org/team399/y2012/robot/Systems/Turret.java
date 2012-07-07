@@ -17,9 +17,9 @@ import org.team399.y2012.Utilities.MovingAverage;
 public class Turret {
 
     private CANJaguar m_turret;
-    //private double p = -100, i = 0, d = -190, deadband = .25;
+    //private double p = -100.0, i = 0.0, d = -1.7, deadband = .25;
     public double positionRaw = 5.0;
-    private double errorTolerance = .05;
+    private double errorTolerance = .03;
     private PrintStream m_print = new PrintStream("[Turret] ");
     private MovingAverage actualFilter = new MovingAverage(4);
     private MovingAverage setFilter = new MovingAverage(4);
@@ -35,11 +35,17 @@ public class Turret {
             m_turret.changeControlMode(CANJaguar.ControlMode.kPosition);
             m_turret.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
             m_turret.configPotentiometerTurns(10);
-            m_turret.configSoftPositionLimits(1.0, 9.6);                                            //TURRET LIMITS
+            
+            //TURRET LIMITS
+            m_turret.configSoftPositionLimits(1.0, 9.6);                                            
+            
             m_turret.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
-            //m_turret.setPID(p, i, d);                                                          //TURRET PID CONSTANTS
+           
+            //TURRET PID CONSTANTS
+            //m_turret.setPID(p, i, d); 
+            
             m_turret.configNeutralMode(CANJaguar.NeutralMode.kBrake);
-            //m_turret.enableControl();
+            m_turret.enableControl();
         } catch (Exception e) {
             System.err.println("[TURRET]Error initializing");
             e.printStackTrace();
@@ -55,13 +61,19 @@ public class Turret {
      * @param angle in pot rotations
      */
     public void setAngle(double angle) {
-
-        positionRaw = setFilter.calculate(angle);
+        try{
+        
+            positionRaw = setFilter.calculate(angle);
         positionRaw *= 100;
         positionRaw = Math.floor(positionRaw);
         positionRaw /= 100;
-        //System.out.println("Turret setAngle: " + angle);
+        System.out.println("Turret setAngle: " + angle);
         bangBangController();
+        // m_turret.setX(angle);
+    }
+    catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setAngleDeg(double angle) {
@@ -76,7 +88,7 @@ public class Turret {
 
     private void bangBangController() {
         double speed = .85;
-        double kP = 1.0, kD = 0.0;
+        double kP = 1.3, kD = 0.1;
 
         prevError = error;
         error = getActualPosition() - positionRaw;
@@ -95,11 +107,14 @@ public class Turret {
 //                    } else {
 //                        m_turret.setX(0);
 //                    }
+                    kP = 2.0;
+                    kD = .2;
                     
-                    kP = 5.0;
+                    speed = (kP*error) - (kD * (error - prevError));
+                    m_turret.setX(speed);
                 }
-                System.out.println("Turret Speed: " + speed);
-                System.out.println("Turret error: " + error);
+                //System.out.println("Turret Speed: " + speed);
+                //System.out.println("Turret error: " + error);
             } else {
                 m_turret.setX(0);
             }
@@ -132,4 +147,15 @@ public class Turret {
         }
         return 0;
     }
+     public double getRawPosition() {
+        try {
+      
+            double actual = m_turret.getPosition();
+            
+            return actual;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+     }
 }

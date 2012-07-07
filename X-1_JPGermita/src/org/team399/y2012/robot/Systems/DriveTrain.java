@@ -178,11 +178,13 @@ public class DriveTrain {
      * @param quickTurn quick turn mode boolean input
      */
     public void cheesyDrive(double left, double right, boolean quickTurn) {
-
-        double wheel = twoStickToTurning(left, right);      //Convert inputs for processing
+        
+         //Convert inputs for processing
+        double wheel = twoStickToTurning(left, right);     
         double throttle = twoStickToThrottle(left, right);
-
-        if (!shifter.get()) {           //Adjuts turning sensitivity value depending on high/low gear
+        
+        //Adjusts turning sensitivity value depending on high/low gear
+        if (!shifter.get()) {           
             tSens = TURBO_MODE_TSENS;
         } else {
             tSens = NORMAL_MODE_TSENS;
@@ -232,19 +234,31 @@ public class DriveTrain {
      * @param gear shifting input, hold for high gear
      */
     public void iCantBelieveItsNotButterDrive(double left, double right, boolean gear) {
-        double throttle = twoStickToThrottle(left, right);	//convert two stick commands to arcade throttle
-        double turning = twoStickToTurning(left, right);	//convert two stick commands to arcade turning
+        //convert two stick commands to arcade throttle
+        double throttle = twoStickToThrottle(left, right);	
+        
+        //convert two stick commands to arcade turning
+        double turning = twoStickToTurning(left, right);	
 
-        double e_tSens = 1;								//scalar value for turning desensitivity
-        double tLim = (1.2 - Math.abs(throttle)) * e_tSens;	//Turn limiting scalar, based on throttle
-
-        if (!gear) {			//High gear
-            turning *= tLim;            //Apply turn scaling if in high gear
+        //scalar value for turning desensitivity
+        double e_tSens = .65;	
+        //Turn limiting scalar, based on throttle
+        double tLim = (1.2 - Math.abs(throttle)) * e_tSens;	
+        
+        //High gear
+        if (!gear) {			
+            //Apply turn scaling if in high gear
+            turning *= tLim;            
             highGear();
-            coast();                    //Put drivetrain into coast for high gear
-        } else {			//Low gear
+            //Put drivetrain into coast for high gear
+            coast();                    
+        } 
+        //Low gear
+            else
+        {			
             lowGear();
-            brake();                    //Put drivetrain into brake for low gear
+             //Put drivetrain into brake for low gear
+            brake();                   
         }
 
         tankDrive((throttle + turning), -(throttle - turning));	//Output

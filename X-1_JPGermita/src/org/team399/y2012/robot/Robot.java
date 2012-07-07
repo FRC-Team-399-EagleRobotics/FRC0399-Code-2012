@@ -39,17 +39,27 @@ public class Robot {
         long initStartTime = System.currentTimeMillis();
         ps_bot.println("Initialization started...");
 
-        drive = new DriveTrain();     //Drivetrain Instantiation
+        //Drivetrain Instantiation
+        drive = new DriveTrain();     
         ps_bot.println("Drivetrain initialized!");
-        shooter = new Shooter();      //Shooter instantiation
+        
+        //Shooter instantiation
+        shooter = new Shooter();     
         ps_bot.println("Shooter initialized!");
-        intake = new Intake();        //Intake instantiation
+        
+        //Intake instantiation
+        intake = new Intake();        
         ps_bot.println("Intake initialized!");
-        turret = new Turret();        //Turret instantiation
+        
+        //Turret instantiation
+        turret = new Turret();        
         ps_bot.println("Turret initialized!");
-        eye = new EagleEye();         //Eagle Eye Instantiation
+         
+        //Eagle Eye Instantiation
+        eye = new EagleEye();        
         ps_bot.println("Vision initialized!");
         ps_bot.println("Systems Initialized");
+        
         shooterSpeedController = new AutoShooterSpeedController();
         shootController = new AutoShootController(shooter, intake, shooterSpeedController);
         adt = new AutoDriveTrain(drive);
@@ -83,12 +93,17 @@ public class Robot {
      */
     public void run() {
         shooter.update();
+       
+         DsLcdStream.println1("Shoot Err: " + ((EagleMath.map((float) Main.funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
+                (float) 1.75, (float) 5.0, (float) 500, (float) 3500)) + shooter.getEncoderRate()) + "          ");
+         DsLcdStream.println2("Shooter Act: " + shooter.getEncoderRate() + "          ");
+        
         //eye.run();
         //eye.run();
-//        DsLcdStream.println1("ShooterKnob: " + (EagleMath.map((float) Main.funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
-//                (float) 1.75, (float) 5.0, (float) 500, (float) 3500)) + "          ");
-//        DsLcdStream.println2("Shooter Act: " + shooter.getEncoderRate() + "          ");
-        DsLcdStream.println1("Targets found: " + eye.getNumberOfTargets() + "          ");
+       
+       
+               
+   //     DsLcdStream.println1("Targets found: " + eye.getNumberOfTargets() + "          ");
         //DsLcdStream.println2("Sizeof tallest target: " + eye.getTallestTarget().area + "          ");
 //        DsLcdStream.println3("Turret Set: " + turret.positionRaw + "          ");
 //        DsLcdStream.println4("Turret Act: " + turret.getActualPosition() + "          ");

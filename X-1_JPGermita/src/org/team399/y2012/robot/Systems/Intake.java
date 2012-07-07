@@ -15,12 +15,19 @@ import org.team399.y2012.Utilities.RateLimitFilter;
  * @author Jeremy
  */
 public class Intake {
-
-    LinearVictor m_intake;      //Linearized victor speed controller for intake motor
-    AnalogChannel m_ballSensor; //Analog channel for VEX line sensor
-    DoubleSolenoid m_dropper;         //Solenoid for bridge mechanism
-    private final double hasBallThresh = .5;   //Threshold
-    //TODO: Tweak this value for real ball
+    //Linearized victor speed controller for intake motor
+    LinearVictor m_intake;
+    
+    //Analog channel for VEX line sensor
+    AnalogChannel m_ballSensor; 
+    
+    //Solenoid for bridge mechanism
+    DoubleSolenoid m_dropper;  
+    
+    //Threshold
+    private final double hasBallThresh = .5;   
+        //TODO: Tweak this value for real ball
+    
     RateLimitFilter vFil = new RateLimitFilter(.5);
 
     /**
