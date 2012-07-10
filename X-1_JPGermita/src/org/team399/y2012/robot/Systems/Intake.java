@@ -16,18 +16,15 @@ import org.team399.y2012.Utilities.RateLimitFilter;
  */
 public class Intake {
     //Linearized victor speed controller for intake motor
+
     LinearVictor m_intake;
-    
     //Analog channel for VEX line sensor
-    AnalogChannel m_ballSensor; 
-    
+    AnalogChannel m_ballSensor;
     //Solenoid for bridge mechanism
-    DoubleSolenoid m_dropper;  
-    
+    DoubleSolenoid m_dropper;
     //Threshold
-    private final double hasBallThresh = .5;   
-        //TODO: Tweak this value for real ball
-    
+    private final double hasBallThresh = .5;
+    //TODO: Tweak this value for real ball
     RateLimitFilter vFil = new RateLimitFilter(.5);
 
     /**
@@ -45,12 +42,12 @@ public class Intake {
      */
     public void setIntake(double value) {
         //vFil.update(value*.7);
-        if(value == 0) vFil.reset();
+        if (value == 0) {
+            vFil.reset();
+        }
         m_intake.set(value);
     }
-
     boolean flopped = false, value = false;
-
 
     /**
      * Move the dropper
@@ -64,6 +61,15 @@ public class Intake {
         } else if (!down) {
             flopped = false;
         }
+    }
+
+    /**
+     * Move the dropper
+     * @param down Button input
+     */
+    public void setDropperRaw(boolean down) {
+
+        m_dropper.set((down) ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
     }
 
     /**

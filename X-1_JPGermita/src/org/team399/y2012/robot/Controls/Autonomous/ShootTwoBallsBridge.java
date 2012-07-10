@@ -29,23 +29,24 @@ public class ShootTwoBallsBridge {
         double autondrivespeeds = .7;   
         
         // Shooter speed
-        double RPM = 2750;
+        double RPM =3000;
         
         double delay = 1.5;             //delay so shooters get up to speed
         double conveystop = 2;          //stop the roller let the shooter catch up
         double conveystart = 2.5;       //start the roller to shoot
         double startDrive = 4.5;        //start moving
-        double bridge = 8.7;              //hit the bridge
+        double bridge = 7.7;              //hit the bridge
         double backAway = 9.5;          //when to start backing away from the bridge
-        double convStop = 11.5;
-        double stop = 13.1;             //stop time
+        double convStop = 11.75;
+        double stop = 12.5;             //stop time
         
-        boolean intake = true;
+        boolean intake = false;
         //shift to low
         Main.bot.drive.lowGear();                            
         
+        
         // Drop dat dropper
-       
+       Main.bot.intake.setDropperRaw(intake);
         
         //move that shooter
         Main.bot.shooter.update();                                
@@ -56,6 +57,8 @@ public class ShootTwoBallsBridge {
         
         //grab current turret postion and hold it!
         Main.bot.turret.setV(0);
+        
+        
         
         //added to prevent conveyor from fighting itself!
         //stop conveyor for to delay to let the shooter stop
@@ -90,14 +93,14 @@ public class ShootTwoBallsBridge {
            System.currentTimeMillis() - startTime < bridge * 1000) 
             {
                 Main.bot.drive.tankDrive(-autondrivespeeds, autondrivespeeds);  
-                Main.bot.intake.setIntake(-1);
+                Main.bot.intake.setIntake(-1);               
             }
             
         //stop at the bridge for a few seconds and let the balls hit us
         if(System.currentTimeMillis() - startTime > bridge *1000 && 
            System.currentTimeMillis() - startTime < backAway * 1000)
             {
-                Main.bot.intake.setDropper(intake);
+                
                 Main.bot.intake.setIntake(-1);
                 Main.bot.drive.tankDrive(0, 0);
             }
@@ -121,7 +124,8 @@ public class ShootTwoBallsBridge {
         if(System.currentTimeMillis() - startTime > stop * 1000)
             {
                 Main.bot.drive.tankDrive(0, 0);   
-                Main.bot.intake.setIntake(-1); 
+                Main.bot.intake.setIntake(-1);
+  
             }
     }
 }

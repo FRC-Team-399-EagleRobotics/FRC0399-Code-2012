@@ -27,7 +27,7 @@ public class ShootTwoBalls {
     public static void run() {
             
         // Speed of shooter, need to test
-        double RPM = 2750;              
+        double RPM = 3000;              
     
         
         double delay = 1.5;             //delay so shooters get up to speed

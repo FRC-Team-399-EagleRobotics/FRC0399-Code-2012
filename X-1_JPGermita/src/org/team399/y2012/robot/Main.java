@@ -14,9 +14,10 @@ import org.team399.y2012.robot.Controls.HumanInterfaceDevices.DriverStationUserI
 import edu.wpi.first.wpilibj.Compressor;
 import org.team399.y2012.robot.Controls.Autonomous.Feed;
 import org.team399.y2012.robot.Controls.Autonomous.HPBlock;
+import org.team399.y2012.robot.Controls.Autonomous.HighGearBothBridges;
 import org.team399.y2012.robot.Controls.Autonomous.ShootTwoBalls;
 import org.team399.y2012.robot.Controls.Autonomous.ShootTwoBallsBridge;
-
+import org.team399.y2012.robot.Controls.Autonomous.HighGearBothBridges;
 
 public class Main extends IterativeRobot {
 
@@ -55,7 +56,7 @@ public class Main extends IterativeRobot {
         } else if (EagleMath.isInBand(funbox.getAnalog(DriverStationUserInterface.PORTS.AUTON_KNOB), 2.0, 2.9)) {
             System.out.println("Feeding");
             auto = 1;
-        } else if (EagleMath.isInBand(funbox.getAnalog(DriverStationUserInterface.PORTS.AUTON_KNOB), 2.9, 3.9)) {
+        } else if (EagleMath.isInBand(funbox.getAnalog(DriverStationUserInterface.PORTS.AUTON_KNOB), 2.9, 3.9)&& !funbox.getDigital(DriverStationUserInterface.PORTS.CAMERA_LOW)) {
             System.out.println("Bridge");
             auto = 2;
         } else if (EagleMath.isInBand(funbox.getAnalog(DriverStationUserInterface.PORTS.AUTON_KNOB), 3.9, 4.5)) {
@@ -64,9 +65,12 @@ public class Main extends IterativeRobot {
         } else if (EagleMath.isInBand(funbox.getAnalog(DriverStationUserInterface.PORTS.AUTON_KNOB), 4.5, 5.0)) {
             auto = 99;
             System.out.println("DO NOTHING!");
-        }
+        }else if (EagleMath.isInBand(funbox.getAnalog(DriverStationUserInterface.PORTS.AUTON_KNOB), 2.9, 3.9) && funbox.getDigital(DriverStationUserInterface.PORTS.CAMERA_LOW)) {
+            auto = 42;
+            System.out.println("High Gear Bridge");
     }
-
+}
+        
     public void autonomousInit() {
         //ai = new AutonInterpreter(auton.getParsedFile());
         
@@ -84,8 +88,11 @@ public class Main extends IterativeRobot {
              HPBlock.start(0);
         } else if (auto == 99) {
              System.out.println("DO Nothing!");
-            
-        }
+        }else if (auto == 42){
+            System.out.println(" High Gear 2 Ball Bridge ");
+            HighGearBothBridges.start(0);
+        }   
+        
     }
 
     /**
@@ -110,7 +117,10 @@ public class Main extends IterativeRobot {
             HPBlock.run();
         } else if (auto == 99) {
             System.out.println("DOING NOTHING!");
-        }
+        }else if (auto == 42){
+            System.out.println(" High Gear ");
+            HighGearBothBridges.run();
+    }
     }
 
     /**

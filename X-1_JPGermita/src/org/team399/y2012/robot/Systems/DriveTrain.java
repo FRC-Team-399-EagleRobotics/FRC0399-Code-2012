@@ -241,7 +241,7 @@ public class DriveTrain {
         double turning = twoStickToTurning(left, right);	
 
         //scalar value for turning desensitivity
-        double e_tSens = .65;	
+        double e_tSens = 1.0;	
         //Turn limiting scalar, based on throttle
         double tLim = (1.2 - Math.abs(throttle)) * e_tSens;	
         
