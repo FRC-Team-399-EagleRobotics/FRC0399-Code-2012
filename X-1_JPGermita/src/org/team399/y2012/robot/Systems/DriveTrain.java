@@ -12,7 +12,6 @@ import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.Utilities.RateLimitFilter;
 import org.team399.y2012.robot.Config.RobotIOMap;
 
-
 /**
  * Drivetrain class that encapsulates all basic drivetrain functions
  * @author Jeremy
@@ -54,11 +53,11 @@ public class DriveTrain {
         try {
             m_leftB = new CANJaguar(RobotIOMap.LEFT_DRIVE_B_ID);
             m_leftB.setVoltageRampRate(56);
-            
+
             m_leftB.changeControlMode(CANJaguar.ControlMode.kPosition);
             m_leftB.setPositionReference(CANJaguar.PositionReference.kQuadEncoder);
             m_leftB.configEncoderCodesPerRev(360);
-            
+
             m_leftB.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
             m_leftB.configNeutralMode(CANJaguar.NeutralMode.kBrake);
             m_leftB.configFaultTime(.5);
@@ -92,7 +91,7 @@ public class DriveTrain {
         ps_drive.println("CAN Jaguar initialization complete");
         yaw.reset();
         pitch.reset();
-        
+
         ps_drive.println("Gyro initialization complete");
         ps_drive.println("Drivetrain initialization complete!");
     }
@@ -178,13 +177,13 @@ public class DriveTrain {
      * @param quickTurn quick turn mode boolean input
      */
     public void cheesyDrive(double left, double right, boolean quickTurn) {
-        
-         //Convert inputs for processing
-        double wheel = twoStickToTurning(left, right);     
+
+        //Convert inputs for processing
+        double wheel = twoStickToTurning(left, right);
         double throttle = twoStickToThrottle(left, right);
-        
+
         //Adjusts turning sensitivity value depending on high/low gear
-        if (!shifter.get()) {           
+        if (!shifter.get()) {
             tSens = TURBO_MODE_TSENS;
         } else {
             tSens = NORMAL_MODE_TSENS;
@@ -235,30 +234,29 @@ public class DriveTrain {
      */
     public void iCantBelieveItsNotButterDrive(double left, double right, boolean gear) {
         //convert two stick commands to arcade throttle
-        double throttle = twoStickToThrottle(left, right);	
-        
+        double throttle = twoStickToThrottle(left, right);
+
         //convert two stick commands to arcade turning
-        double turning = twoStickToTurning(left, right);	
+        double turning = twoStickToTurning(left, right);
 
         //scalar value for turning desensitivity
-        double e_tSens = 1.0;	
+        double e_tSens = .60;
         //Turn limiting scalar, based on throttle
-        double tLim = (1.2 - Math.abs(throttle)) * e_tSens;	
-        
+        double tLim = (1.2 - Math.abs(throttle)) * e_tSens;
+
         //High gear
-        if (!gear) {			
+        if (!gear) {
             //Apply turn scaling if in high gear
-            turning *= tLim;            
+            turning *= tLim;
+            //turning = (turning*turning*turning);
             highGear();
             //Put drivetrain into coast for high gear
-            coast();                    
-        } 
-        //Low gear
-            else
-        {			
+            coast();
+        } //Low gear
+        else {
             lowGear();
-             //Put drivetrain into brake for low gear
-            brake();                   
+            //Put drivetrain into brake for low gear
+            brake();
         }
 
         tankDrive((throttle + turning), -(throttle - turning));	//Output
@@ -378,7 +376,7 @@ public class DriveTrain {
             }
             try {
                 pl_err = pl_pos - m_leftB.getPosition();
-                
+
             } catch (Exception e) {
             }
 
@@ -394,4 +392,14 @@ public class DriveTrain {
             pl_counter = 0;
         }
     }
+
+    /**
+     * Increment the pid loop setpoint for fine adjustment
+     * @param counts the number of encoder counts to incrememnt the setpoint 
+     */
+    public void PIDLockIncrement(double counts) {
+        pl_pos += counts;
+    }
+    
+    
 }

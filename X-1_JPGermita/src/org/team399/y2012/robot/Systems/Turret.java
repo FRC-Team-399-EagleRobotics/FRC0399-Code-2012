@@ -5,10 +5,10 @@
 package org.team399.y2012.robot.Systems;
 
 import edu.wpi.first.wpilibj.CANJaguar;
-import org.team399.y2012.Utilities.EagleMath;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 import org.team399.y2012.Utilities.MovingAverage;
+import org.team399.y2012.Utilities.PulseTriggerBoolean;
 
 /**
  *
@@ -67,8 +67,8 @@ public class Turret {
         positionRaw *= 100;
         positionRaw = Math.floor(positionRaw);
         positionRaw /= 100;
-        System.out.println("Turret setAngle: " + angle);
-        bangBangController();
+        //System.out.println("Turret setAngle: " + angle);
+        turretPositionLoop();
         // m_turret.setX(angle);
     }
     catch (Exception e) {
@@ -86,9 +86,9 @@ public class Turret {
     }
     double prevError = 0, error = 0;
 
-    private void bangBangController() {
+    public void turretPositionLoop() {
         double speed = .85;
-        double kP = 1.0, kD = 0;
+        double kP = 1.0, kD = 0.08;
 
         prevError = error;
         error = getActualPosition() - positionRaw;
@@ -150,5 +150,13 @@ public class Turret {
             e.printStackTrace();
         }
         return 0;
+     }
+     PulseTriggerBoolean inc_pulse = new PulseTriggerBoolean();
+     
+     public void increment(boolean inc, double value) {
+         inc_pulse.set(inc);
+         if(inc_pulse.get()) {
+             positionRaw += value;
+         }
      }
 }

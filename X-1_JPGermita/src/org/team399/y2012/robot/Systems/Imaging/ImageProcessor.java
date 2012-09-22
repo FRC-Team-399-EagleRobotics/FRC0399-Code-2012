@@ -112,27 +112,23 @@ public class ImageProcessor {
         /**
          * The target's X axis value in the image
          */
-        public int x;
+        public int x = 0;
         /**
          * The target's Y axis value in the image
          */
         public int y;
-        
         /**
          * The target's width
          */
-        public int width;
-        
+        public int width = 0;
         /**
          * The target's height
          */
         public int height = 0;
-        
         /**
          * The target's calculated straight line distance from the camera lens
          */
         public double distance = 0;
-        
         /**
          * The target's area in the image
          */
@@ -143,12 +139,21 @@ public class ImageProcessor {
          * @param par 
          */
         public Target(ParticleAnalysisReport par) {
-            x = par.center_mass_x;
-            y = par.center_mass_y;
-            width = par.boundingRectWidth;
-            height = par.boundingRectHeight;
-            area = par.particleArea;
-            distance = calculateDistance();
+            try {
+                x = par.center_mass_x;
+                y = par.center_mass_y;
+                width = par.boundingRectWidth;
+                height = par.boundingRectHeight;
+                area = par.particleArea;
+                distance = calculateDistance();
+            } catch (Exception e) {
+                x = 0;
+                y = 0;
+                width = 0;
+                height = 0;
+                area = 0;
+                distance = 0;
+            }
         }
 
         /**

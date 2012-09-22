@@ -10,18 +10,17 @@ import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 import org.team399.y2012.robot.Systems.Imaging.ImageProcessor.Target;
 
-
 /**
  * Eagle Eye class. Encapsulates camera, ImageTracker, and the RGB light ring into one class.
  * @author Jeremy Germita, Justin S. Jackie P.
  * 
  */
-public class EagleEye extends Thread{
+public class EagleEye extends Thread {
+
     private Relay greenRing = new Relay(8);
     public LightRing ring;
     public Camera cam;
     private Target[] targets;
-    
     private PrintStream m_ps = new PrintStream("[EAGLE-EYE] ");
     //Color Thresholds
     Color[] colors = {
@@ -49,8 +48,8 @@ public class EagleEye extends Thread{
         } else if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kInvalid)) {
             ring.setRGB(0, 1, 0);
         }
-        for(double c = 0.0; c < 1.0; c+=.01) {
-            ring.setRGB(0, c, 1.0-c);
+        for (double c = 0.0; c < 1.0; c += .01) {
+            ring.setRGB(0, c, 1.0 - c);
         }
         greenRing.set(Relay.Value.kForward);
         System.out.println("[EAGLE-EYE] Eagle Eye initialized");
@@ -60,6 +59,7 @@ public class EagleEye extends Thread{
     boolean targetsFound = false;
     int colorIndex = 0;
     long timeLastTarget = 0;
+    boolean enable = true;
 
     /**
      * Main run method. Call this for functionality.
@@ -69,14 +69,14 @@ public class EagleEye extends Thread{
         ring.set(colors[colorIndex]);
 
         loopCount++;
-        if (cam.freshImage()) {
+        if (cam.freshImage() && enable) {
 
             m_ps.println("Image Processing started...");
             long procStartTime = System.currentTimeMillis();
             targets = ImageProcessor.processImage(cam.getImage(), thresholds[0]);    //Process image from camera using given thresholds
             long timeElapsed = (System.currentTimeMillis() - procStartTime);
             m_ps.println("Image processing complete!");
-            m_ps.println("Image Processing took " +  timeElapsed + " ms.");
+            m_ps.println("Image Processing took " + timeElapsed + " ms.");
             if (targets != null && targets.length > 0) {    //If targets are detected
 
                 targetsFound = true;                        //Set flag to true
@@ -91,7 +91,11 @@ public class EagleEye extends Thread{
             }
         }
     }
-    
+
+    public void enable(boolean en) {
+        enable = en;
+    }
+
     public int getNumberOfTargets() {
         try {
             return getTargets().length;
@@ -120,28 +124,28 @@ public class EagleEye extends Thread{
      * Returns the target with the highest Y value
      * @return 
      */
-    public Target getTallestTarget() {
+    public Target getHighestTarget() {
         if (targets == null) {
             return null;
         }
-        Target tallest = targets[0];
+        Target highest = targets[0];
         for (int i = 1; i < targets.length; i++) {
-            if (targets[i].y < tallest.y) {
-                tallest = targets[i];
+            if (targets[i].y < highest.y) {
+                highest = targets[i];
             }
         }
-        return tallest;
+        return highest;
     }
 
     /**
      * A demonstration mode for the light ring. Flashes nifty colors.
      */
     public void demoMode() {
-        
+
         long timer = System.currentTimeMillis();
         timer = timer % 16500;
         //timer = timer % 5000;
-        ring.setHSL((float)(timer/13.888888), 255.0, 100.0);
+        ring.setHSL((float) (timer / 13.888888), 255.0, 100.0);
         //ring.setRGB(Math.sin((double)(timer/5000) * (2*Math.PI)), Math.cos((double)(timer/5000) * (2*Math.PI)), Math.sin((timer/5000) + (2*Math.PI)));
 //
 //        Color[] patriotic = {

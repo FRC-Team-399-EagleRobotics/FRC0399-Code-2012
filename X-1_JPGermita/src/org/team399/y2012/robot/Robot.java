@@ -93,19 +93,11 @@ public class Robot {
      */
     public void run() {
         shooter.update();
+        eye.run();
        
-         DsLcdStream.println1("Shoot Err: " + ((EagleMath.map((float) Main.funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
-                (float) 1.75, (float) 5.0, (float) 500, (float) 3500)) + shooter.getEncoderRate()) + "          ");
-         DsLcdStream.println2("Shooter Act: " + shooter.getEncoderRate() + "          ");
+//         DsLcdStream.println1("Shoot Err: " + ((EagleMath.map((float) Main.funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
+//                (float) 1.75, (float) 5.0, (float) 500, (float) 3500)) + shooter.getEncoderRate()) + "          ");
+//         DsLcdStream.println2("Shooter Act: " + shooter.getEncoderRate() + "          ");
         
-        //eye.run();
-        //eye.run();
-       
-       
-               
-   //     DsLcdStream.println1("Targets found: " + eye.getNumberOfTargets() + "          ");
-        //DsLcdStream.println2("Sizeof tallest target: " + eye.getTallestTarget().area + "          ");
-//        DsLcdStream.println3("Turret Set: " + turret.positionRaw + "          ");
-//        DsLcdStream.println4("Turret Act: " + turret.getActualPosition() + "          ");
     }
 }
