@@ -28,6 +28,9 @@ public class DriveTrain {
     private MovingAverage m_pitchFilter = new MovingAverage(8);
     private RateLimitFilter m_yawFilter = new RateLimitFilter(.1);
     private PrintStream ps_drive = new PrintStream("[DRIVE] ");
+    
+    public double left_power = 0;
+    public double right_power = 0;
 
     /**
      * Constructor
@@ -98,10 +101,12 @@ public class DriveTrain {
 
     /**
      * Basic tank drive method
-     * @param leftPower left power to set
+     * @param leftPower left_power power to set
      * @param rightPower right power to set
      */
     public void tankDrive(double leftPower, double rightPower) {
+        this.left_power = leftPower;
+        this.right_power = rightPower;
         try {
             m_leftA.setX(leftPower);
         } catch (Exception e) {
@@ -228,7 +233,7 @@ public class DriveTrain {
     /**
      * Drive algorithm written by Jeremy. Adjusts turning sensitivity with throttle.
      * Dynamic brake/coasting based on gear
-     * @param left left joystick input
+     * @param left_power left_power joystick input
      * @param right right joystick input
      * @param gear shifting input, hold for high gear
      */
@@ -240,7 +245,7 @@ public class DriveTrain {
         double turning = twoStickToTurning(left, right);
 
         //scalar value for turning desensitivity
-        double e_tSens = .60;
+        double e_tSens = .70;
         //Turn limiting scalar, based on throttle
         double tLim = (1.2 - Math.abs(throttle)) * e_tSens;
 
@@ -276,7 +281,7 @@ public class DriveTrain {
 
     /**
      * Converts tank Y axis values into a turning value
-     * @param leftIn left Y axis
+     * @param leftIn left_power Y axis
      * @param rightIn right Y axis
      * @return Turning output
      */

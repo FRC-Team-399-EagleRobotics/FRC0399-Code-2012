@@ -19,11 +19,16 @@ public class Camera {
      * Constructor
      */
     public Camera() {
-        try {
-            camera = AxisCamera.getInstance();
-        } catch (Exception e) {
-            System.err.println("[CAMERA]Error initializing");
-            e.printStackTrace();
+        synchronized (this) {
+            try {
+                camera = AxisCamera.getInstance();
+                camera.writeResolution(AxisCamera.ResolutionT.k320x240);
+                camera.writeExposurePriority(AxisCamera.ExposurePriorityT.frameRate);
+
+            } catch (Exception e) {
+                System.err.println("[CAMERA]Error initializing");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -31,7 +36,7 @@ public class Camera {
      * Returns true if the camera has a new image
      * @return 
      */
-    public boolean freshImage() {
+    public synchronized boolean freshImage() {
         return camera.freshImage();
     }
 
@@ -39,7 +44,7 @@ public class Camera {
      * Color image, ready for processing
      * @return 
      */
-    public ColorImage getImage() {
+    public synchronized ColorImage getImage() {
         try {
             return camera.getImage();
         } catch (Exception e) {

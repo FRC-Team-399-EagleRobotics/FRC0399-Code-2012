@@ -166,16 +166,16 @@ public class Shooter extends Thread {
         if (out > 1) {  //Clamping the output to +- 1
             out = 1;
         }
-
-        pidDash.addDouble(setPointV);
-        pidDash.addDouble(vel);
-        pidDash.addDouble(out);
-        pidDash.addDouble(P * (err - prevErr));
-        pidDash.addDouble(I * err);
-        pidDash.addDouble(D * (err - 2 * prevErr + prevPrevErr));
-        pidDash.addDouble(K * setPointV);
-        pidDash.addDouble(err);
-        pidDash.commit();
+//
+//        pidDash.addDouble(setPointV);
+//        pidDash.addDouble(vel);
+//        pidDash.addDouble(out);
+//        pidDash.addDouble(P * (err - prevErr));
+//        pidDash.addDouble(I * err);
+//        pidDash.addDouble(D * (err - 2 * prevErr + prevPrevErr));
+//        pidDash.addDouble(K * setPointV);
+//        pidDash.addDouble(err);
+//        pidDash.commit();
         shoot();
     }
 

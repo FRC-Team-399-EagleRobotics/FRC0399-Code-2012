@@ -69,8 +69,8 @@ public class Main extends IterativeRobot {
             auto = 42;
             //System.out.println("High Gear Bridge");
         }
-        
-        
+
+
     }
 
     public void autonomousInit() {
@@ -94,6 +94,7 @@ public class Main extends IterativeRobot {
             System.out.println(" High Gear 2 Ball Bridge ");
             HighGearBothBridges.start(0);
         }
+        //bot.eye.start();
 
     }
 
@@ -126,22 +127,27 @@ public class Main extends IterativeRobot {
     }
 
     public void teleopInit() {
-        turretAngle = EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0);
+        //bot.eye.start();
     }
 
     /**
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-        bot.run();  //Basic robot functions that run continuously
+        
         drive();    //Driver routine
         operate();  //operator routine
+        bot.eye.run();
 
-        if(bot.eye.getTargets() != null) {
-            DsLcdStream.printlnMain("Image Data:                ");
-            DsLcdStream.println1("Area: " + bot.eye.getHighestTarget().area);
-            DsLcdStream.println2(bot.eye.getHighestTarget().x + ", " + bot.eye.getHighestTarget().y);
-        }
+//        if (bot.eye.getHighestTarget() != null) {
+//            System.out.println("Image Data: ");
+//            System.out.println("Area: " + bot.eye.getHighestTarget().area);
+//            System.out.println(bot.eye.getHighestTarget().x + ", " + bot.eye.getHighestTarget().y);
+//        }
+    }
+    
+    public void teleopContinuous() {
+        bot.run();  //Basic robot functions that run continuously    
     }
 
     /**
@@ -163,16 +169,8 @@ public class Main extends IterativeRobot {
         } else if (pidBrake) {
             bot.drive.PIDLock(true);
             System.out.println("BaseLocked!");
+            bot.drive.PIDLockIncrement(-.25* leftJoy.getRawAxis(2));
 
-            boolean incFwd = false;
-            boolean incRev = false;
-            double incVal = 5;
-
-            if (incFwd) {
-                bot.drive.PIDLockIncrement(incVal);
-            } else if (incRev) {
-                bot.drive.PIDLockIncrement(-incVal);
-            }
 
         } else {
             bot.drive.iCantBelieveItsNotButterDrive(leftPower, -rightPower, shift);
@@ -210,7 +208,7 @@ public class Main extends IterativeRobot {
         boolean manualAim = funbox.getTurretSwitch().equals("MANUAL");
 
         //System.out.println("FB Raw:" + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
-        System.out.println("FB Scaled:" + EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0));
+        //System.out.println("FB Scaled:" + EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0));
         //System.out.println("Turret Actual:" + Main.bot.turret.getActualPosition());
 
         //        if (!(autoAimLock || autoAimLFend || autoAimRFend || autoAimKey)) {
@@ -233,10 +231,8 @@ public class Main extends IterativeRobot {
         } else if (autoAimRFend) {
             bot.aic.rightFender();
         } else if (autoAim) {
-            double turret_step = .15;
-            turret_step *= (leftJoy.getRawButton(5)) ? -1 : ((leftJoy.getRawButton(5)) ? 1 : (1));
-            bot.turret.increment(leftJoy.getRawButton(5) || leftJoy.getRawButton(6), turret_step);
-            bot.turret.turretPositionLoop();
+            bot.aic.lockOn();
+
         } else if (funbox.getDigital(DriverStationUserInterface.PORTS.TURRET_SWITCH_OFF)) {
             bot.turret.setV(0);
         }
@@ -261,9 +257,9 @@ public class Main extends IterativeRobot {
         } else {
             bot.shooter.setVelocity(0);
 
-            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON) || leftJoy.getRawButton(4)) {
+            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON) || leftJoy.getRawButton(6)) {
                 bot.intake.setIntake(-intakeSpeed);
-            } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON) || leftJoy.getRawButton(4)) {
+            } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON) || leftJoy.getRawButton(5)) {
                 bot.intake.setIntake(intakeSpeed);
             } else {
                 bot.intake.setIntake(0);

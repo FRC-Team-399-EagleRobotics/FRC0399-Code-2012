@@ -36,6 +36,7 @@ public class Robot {
      * Constructor. Insert any other initialization commands here
      */
     public Robot() {
+        DsLcdStream.printlnMain("Init Started...");
         long initStartTime = System.currentTimeMillis();
         ps_bot.println("Initialization started...");
 
@@ -68,19 +69,6 @@ public class Robot {
 //        ps_bot.println("Excecuting garbage collection...");
 //        System.gc();
         ps_bot.println("Initialization complete!");
-
-        ps_bot.println("/////////////////////////");
-        ps_bot.println("//       ooo    ooo    //");
-        ps_bot.println("//       ooo    ooo    //");
-        ps_bot.println("//                     //");
-        ps_bot.println("//     **************  //");
-        ps_bot.println("//      **        **   //");
-        ps_bot.println("//        **    **     //");
-        ps_bot.println("//          ****       //");
-        ps_bot.println("/////////////////////////");
-        ps_bot.println(" ");
-
-
         ps_bot.println("Initialization took " + ((double) initStartTime) / 1000 + " seconds!");
         DsLcdStream.printlnMain("Init done! Took " + ((double) initStartTime) / 1000 + " seconds!");
         //eye.start();
@@ -93,7 +81,7 @@ public class Robot {
      */
     public void run() {
         shooter.update();
-        eye.run();
+        //eye.run();
        
 //         DsLcdStream.println1("Shoot Err: " + ((EagleMath.map((float) Main.funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
 //                (float) 1.75, (float) 5.0, (float) 500, (float) 3500)) + shooter.getEncoderRate()) + "          ");

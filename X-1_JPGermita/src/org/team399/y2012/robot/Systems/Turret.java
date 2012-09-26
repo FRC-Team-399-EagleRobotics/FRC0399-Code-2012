@@ -35,15 +35,15 @@ public class Turret {
             m_turret.changeControlMode(CANJaguar.ControlMode.kPosition);
             m_turret.setPositionReference(CANJaguar.PositionReference.kPotentiometer);
             m_turret.configPotentiometerTurns(10);
-            
+
             //TURRET LIMITS
-            m_turret.configSoftPositionLimits(1.0, 9.6);                                            
-            
+            m_turret.configSoftPositionLimits(1.0, 9.6);
+
             m_turret.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
-           
+
             //TURRET PID CONSTANTS
             //m_turret.setPID(p, i, d); 
-            
+
             m_turret.configNeutralMode(CANJaguar.NeutralMode.kBrake);
             m_turret.enableControl();
         } catch (Exception e) {
@@ -61,17 +61,16 @@ public class Turret {
      * @param angle in pot rotations
      */
     public void setAngle(double angle) {
-        try{
-        
+        try {
+
             positionRaw = setFilter.calculate(angle);
-        positionRaw *= 100;
-        positionRaw = Math.floor(positionRaw);
-        positionRaw /= 100;
-        //System.out.println("Turret setAngle: " + angle);
-        turretPositionLoop();
-        // m_turret.setX(angle);
-    }
-    catch (Exception e) {
+            positionRaw *= 100;
+            positionRaw = Math.floor(positionRaw);
+            positionRaw /= 100;
+            //System.out.println("Turret setAngle: " + angle);
+            turretPositionLoop();
+            // m_turret.setX(angle);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -94,16 +93,16 @@ public class Turret {
         error = getActualPosition() - positionRaw;
         try {
             if (Math.abs(error) > errorTolerance) {
-                if (Math.abs(error) > 0 ) {
+                if (Math.abs(error) > 0) {
                     //speed = .15;
-                    speed = (kP*error) - (kD * (error - prevError));
+                    speed = (kP * error) - (kD * (error - prevError));
 
                     m_turret.setX(speed);
                 } else {
                     kP = 2.0;
                     kD = .2;
-                    
-                    speed = (kP*error) - (kD * (error - prevError));
+
+                    speed = (kP * error) - (kD * (error - prevError));
                     m_turret.setX(speed);
                 }
                 //System.out.println("Turret Speed: " + speed);
@@ -140,23 +139,24 @@ public class Turret {
         }
         return 0;
     }
-     public double getRawPosition() {
+
+    public double getRawPosition() {
         try {
-      
+
             double actual = m_turret.getPosition();
-            
+
             return actual;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return 0;
-     }
-     PulseTriggerBoolean inc_pulse = new PulseTriggerBoolean();
-     
-     public void increment(boolean inc, double value) {
-         inc_pulse.set(inc);
-         if(inc_pulse.get()) {
-             positionRaw += value;
-         }
-     }
+    }
+    PulseTriggerBoolean inc_pulse = new PulseTriggerBoolean();
+
+    public void increment(boolean inc, double value) {
+        inc_pulse.set(inc);
+        if (inc_pulse.get()) {
+            positionRaw += value;
+        }
+    }
 }

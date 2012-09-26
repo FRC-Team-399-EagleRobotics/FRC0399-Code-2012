@@ -4,6 +4,8 @@
  */
 package org.team399.y2012.robot.Controls.Automation;
 
+import com.sun.squawk.util.MathUtils;
+import org.team399.y2012.Utilities.EagleMath;
 import org.team399.y2012.robot.Systems.Imaging.EagleEye;
 import org.team399.y2012.robot.Systems.Turret;
 
@@ -30,17 +32,32 @@ public class AutoAimController {
      * Will not do anything if no target found
      */
     public void lockOn() {
+        double trackingP = -.02, trackingD = .05;
+        
         //DO WORK HERE
         //if (System.currentTimeMillis() % 100 < 5) {      //Put on a .1 second timer to reduce noise in tracking
-        if (m_turret.isAtAngle() && m_eye.foundTarget()) {    //Check to see if turret is still trying to go to a set position
-            System.out.println("AutoLocking!");
+        if(m_eye.getHighestTarget() != null) {
+            System.out.println("Auto Aim Controller Running!");
+            System.out.println("Number of targets found: " + m_eye.getNumberOfTargets());
             double targetDistance = m_eye.getHighestTarget().distance;  //Get distance in inches
-            double xErr = 240 - m_eye.getHighestTarget().x;             //Target's distance from the center of view
-            System.out.println("Power: " + xErr * .0025);
-            m_turret.setV(xErr * .0025);
+            double xErr = 160 - m_eye.getHighestTarget().x;             //Target's distance from the center of view
+            //double angleOffset = MathUtils.atan2(targetDistance, xErr);
+            double angleOffset = EagleMath.map((float)xErr, -160, 160, 45, -45);
+            //angleOffset -= Math.PI/2;
+            //angleOffset *= 57.2957795;
+            //angleOffset /= 2;
+            angleOffset = EagleMath.truncate(angleOffset, 2);
+            System.out.println("Target Distance:     " + targetDistance);
+            System.out.println("Target X Offset:     " + xErr);
+            System.out.println("Target Angle Offset: " + angleOffset);
+            
+            
+            
+            m_turret.setV((angleOffset * trackingP) - (trackingD*(angleOffset * trackingP)));
         } else {
             m_turret.setV(0);
         }
+            //m_turret.turretPositionLoop();
         //}
     }
 

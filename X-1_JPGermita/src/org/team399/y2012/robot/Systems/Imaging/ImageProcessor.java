@@ -18,8 +18,8 @@ import java.util.Vector;
  */
 public class ImageProcessor {
 
-    public static final double areaThresh = 444;
-    public static final double rectThresh = 70;
+    public static final double areaThresh = 1000;
+    public static final double rectThresh = 50;
     public static final double aspectThresh = 0;
     public static final int cameraHeight = 240;
     public static final int cameraWidth = 320;
@@ -50,12 +50,12 @@ public class ImageProcessor {
     public static Target[] processImage(ColorImage image, Threshold thresh) {
         //System.out.println("[EAGLE-EYE] Image processor started...");
         if (image == null) {
-            //System.out.println("[EAGLE-EYE] Image null, processor ended");
+            System.out.println("[IMG-PROC] Image null, processor ended");
             return null;   //If the image is null, return a null target
         }
         BinaryImage masked;
         BinaryImage hulled;
-        BinaryImage filtered;
+        //BinaryImage filtered;
         Vector rects = new Vector();
         rects.ensureCapacity(4);
         ParticleAnalysisReport[] all;
@@ -65,15 +65,17 @@ public class ImageProcessor {
                     thresh.SatLow, thresh.SatHigh,
                     thresh.LumLow, thresh.LumHigh);
             hulled = masked.convexHull(true);
-            filtered = hulled.removeSmallObjects(true, 2);
-            all = filtered.getOrderedParticleAnalysisReports(6);  //Get sorted particle report. sorted in order of size
+            //filtered = hulled.removeSmallObjects(true, 2);
+            all = hulled.getOrderedParticleAnalysisReports(6);  //Get sorted particle report. sorted in order of size
             image.free();
-            filtered.free();
+            //filtered.free();
             hulled.free();
             masked.free();
         } catch (NIVisionException e) {
+            System.out.println("[IMG-PROC] NI Vision exception, processor ended");
             return null;
         }
+
 
         for (int i = 0; i < all.length; i++) {               //Store the targets that pass the size limit
             if (all[i].particleArea > areaThresh) {
@@ -89,9 +91,7 @@ public class ImageProcessor {
                         && aspectRatioScore > aspectThresh) {
                     Target current = new Target(all[i]);
                     rects.addElement(current);          //Target found, return it 
-                } else {
                 }
-            } else {
             }
 
         }
@@ -99,6 +99,7 @@ public class ImageProcessor {
         Target[] targets = new Target[rects.size()];
         rects.copyInto(targets);
         if (targets.length == 0) {
+            //System.out.println("[IMG-PROC] No targets found, processor ended");
             return null;
         }
         return targets;
@@ -116,7 +117,7 @@ public class ImageProcessor {
         /**
          * The target's Y axis value in the image
          */
-        public int y;
+        public int y = 0;
         /**
          * The target's width
          */
@@ -174,14 +175,15 @@ public class ImageProcessor {
         public int getPixelsAboveCenter() {
             return x - (120);
         }
-        private final double cameraHalfTanAngle = Math.tan(48.0 * Math.PI / 360.0);
+        private final double cameraHalfTanAngle = Math.tan(42.0 * Math.PI / 360.0);
 
         /**
          * Attempts to calculate distance from the target
          * @return 
          */
         public double calculateDistance() {
-            return cameraWidth / (width * cameraHalfTanAngle);
+            double answer = cameraWidth / (width * cameraHalfTanAngle);
+            return answer;
         }
     }
 }
