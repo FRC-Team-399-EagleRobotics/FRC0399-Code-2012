@@ -32,7 +32,7 @@ public class AutoAimController {
      * Will not do anything if no target found
      */
     public void lockOn() {
-        double trackingP = -.02, trackingD = .05;
+        double trackingP = -.1, trackingD = .075;
         
         //DO WORK HERE
         //if (System.currentTimeMillis() % 100 < 5) {      //Put on a .1 second timer to reduce noise in tracking
