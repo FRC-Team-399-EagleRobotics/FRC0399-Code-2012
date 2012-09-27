@@ -137,7 +137,7 @@ public class Main extends IterativeRobot {
         
         drive();    //Driver routine
         operate();  //operator routine
-        bot.eye.run();
+        //bot.eye.run();
 
 //        if (bot.eye.getHighestTarget() != null) {
 //            System.out.println("Image Data: ");
@@ -178,8 +178,7 @@ public class Main extends IterativeRobot {
         }
 
     }
-    PulseTriggerBoolean t_inc_left = new PulseTriggerBoolean();
-    PulseTriggerBoolean t_inc_right = new PulseTriggerBoolean();
+    
     double turretAngle = 0;
 
     /**
@@ -195,6 +194,7 @@ public class Main extends IterativeRobot {
                 autoAimRFend = false,
                 autoAim = funbox.getDigital(DriverStationUserInterface.PORTS.TURRET_SWITCH_AUTO);
 
+        
 
 
         double shooterSpeed = //4000
@@ -219,11 +219,9 @@ public class Main extends IterativeRobot {
 
         //System.out.println("Turret knob: " + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
         if (manualAim) {
-            turretAngle = EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0);
-
+            turretAngle = 
+                    EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0);
             bot.turret.setAngle(turretAngle);//TODO: scale to range
-
-
         } else if (autoAimLock) {
             bot.aic.lockOn();
         } else if (autoAimLFend) {
@@ -265,6 +263,8 @@ public class Main extends IterativeRobot {
                 bot.intake.setIntake(0);
             }
         }
+        
+        bot.aic.enable = !shoot;
 
 
         bot.shooter.setHood(hood);

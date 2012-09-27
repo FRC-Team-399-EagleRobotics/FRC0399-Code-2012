@@ -26,38 +26,45 @@ public class AutoAimController {
         this.m_turret = turret;
         this.m_eye = eye;
     }
+    public boolean enable = true;
 
     /**
      * Routine to lock on to the highest target in view.
      * Will not do anything if no target found
      */
     public void lockOn() {
-        double trackingP = -.1, trackingD = .075;
-        
-        //DO WORK HERE
-        //if (System.currentTimeMillis() % 100 < 5) {      //Put on a .1 second timer to reduce noise in tracking
-        if(m_eye.getHighestTarget() != null) {
-            System.out.println("Auto Aim Controller Running!");
-            System.out.println("Number of targets found: " + m_eye.getNumberOfTargets());
-            double targetDistance = m_eye.getHighestTarget().distance;  //Get distance in inches
-            double xErr = 160 - m_eye.getHighestTarget().x;             //Target's distance from the center of view
-            //double angleOffset = MathUtils.atan2(targetDistance, xErr);
-            double angleOffset = EagleMath.map((float)xErr, -160, 160, 45, -45);
-            //angleOffset -= Math.PI/2;
-            //angleOffset *= 57.2957795;
-            //angleOffset /= 2;
-            angleOffset = EagleMath.truncate(angleOffset, 2);
-            System.out.println("Target Distance:     " + targetDistance);
-            System.out.println("Target X Offset:     " + xErr);
-            System.out.println("Target Angle Offset: " + angleOffset);
-            
-            
-            
-            m_turret.setV((angleOffset * trackingP) - (trackingD*(angleOffset * trackingP)));
+        double trackingP = -.02525, trackingD = .04;
+
+        if (enable) {
+            m_eye.run();
+            //DO WORK HERE
+            //if (System.currentTimeMillis() % 100 < 5) {      //Put on a .1 second timer to reduce noise in tracking
+            if (m_eye.getHighestTarget() != null) {
+
+                System.out.println("Auto Aim Controller Running!");
+                System.out.println("Number of targets found: " + m_eye.getNumberOfTargets());
+                double targetDistance = m_eye.getHighestTarget().distance;  //Get distance in inches
+                double xErr = 160 - m_eye.getHighestTarget().x;             //Target's distance from the center of view
+                //double angleOffset = MathUtils.atan2(targetDistance, xErr);
+                double angleOffset = EagleMath.map((float) xErr, -160, 160, 45, -45);
+                //angleOffset -= Math.PI/2;
+                //angleOffset *= 57.2957795;
+                //angleOffset /= 2;
+                angleOffset = EagleMath.truncate(angleOffset, 2);
+                System.out.println("Target Distance:     " + targetDistance);
+                System.out.println("Target X Offset:     " + xErr);
+                System.out.println("Target Angle Offset: " + angleOffset);
+
+
+
+                m_turret.setV((angleOffset * trackingP) - (trackingD * (angleOffset * trackingP)));
+            } else {
+                m_turret.setV(0);
+            }
         } else {
             m_turret.setV(0);
         }
-            //m_turret.turretPositionLoop();
+        //m_turret.turretPositionLoop();
         //}
     }
 
