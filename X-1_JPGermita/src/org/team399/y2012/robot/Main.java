@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import org.team399.y2012.Utilities.EagleMath;
 import org.team399.y2012.robot.Controls.HumanInterfaceDevices.DriverStationUserInterface;
 import edu.wpi.first.wpilibj.Compressor;
-import org.team399.y2012.Utilities.DsLcdStream;
-import org.team399.y2012.Utilities.PulseTriggerBoolean;
 import org.team399.y2012.robot.Controls.Autonomous.Feed;
 import org.team399.y2012.robot.Controls.Autonomous.HPBlock;
 import org.team399.y2012.robot.Controls.Autonomous.ShootTwoBalls;
@@ -37,18 +35,9 @@ public class Main extends IterativeRobot {
         bot = new Robot();
         comp.start();
         bot.shooter.setEnabled(true);
-
-        //auton = new AutonFile("file:///testAuton.txt");
-
-
     }
 
     public void disabledPeriodic() {
-//        bot.eye.demoMode();
-
-        //System.out.println("FB Scaled:" + EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0)); 
-        //System.out.println("FB Knob:" + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
-        //System.out.println("Robot Pot: " + bot.turret.getActualPosition());
 
         if (EagleMath.isInBand(funbox.getAnalog(DriverStationUserInterface.PORTS.AUTON_KNOB), 0.1, 2.0)) {
             //System.out.println("Two ball");
@@ -74,8 +63,6 @@ public class Main extends IterativeRobot {
     }
 
     public void autonomousInit() {
-        //ai = new AutonInterpreter(auton.getParsedFile());
-
         if (auto == 0) {
             System.out.println("TwoBallShoot");
             ShootTwoBalls.start(0);
@@ -94,8 +81,6 @@ public class Main extends IterativeRobot {
             System.out.println(" High Gear 2 Ball Bridge ");
             HighGearBothBridges.start(0);
         }
-        //bot.eye.start();
-
     }
 
     /**
@@ -104,7 +89,6 @@ public class Main extends IterativeRobot {
     public void autonomousPeriodic() {
 
         bot.run();
-        // ai.run();
 
         if (auto == 0) {
             System.out.println("TwoBallShoot");
@@ -127,25 +111,17 @@ public class Main extends IterativeRobot {
     }
 
     public void teleopInit() {
-        //bot.eye.start();
     }
 
     /**
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-        
+
         drive();    //Driver routine
         operate();  //operator routine
-        //bot.eye.run();
-
-//        if (bot.eye.getHighestTarget() != null) {
-//            System.out.println("Image Data: ");
-//            System.out.println("Area: " + bot.eye.getHighestTarget().area);
-//            System.out.println(bot.eye.getHighestTarget().x + ", " + bot.eye.getHighestTarget().y);
-//        }
     }
-    
+
     public void teleopContinuous() {
         bot.run();  //Basic robot functions that run continuously    
     }
@@ -162,14 +138,10 @@ public class Main extends IterativeRobot {
 //DROPPER
         bot.intake.setDropper(intake);
 //LOW Gear        
-        if (leftJoy.getRawButton(2)) {
-            bot.drive.tankDrive(-.4, .4);
-            bot.drive.lowGear();
-//PID Brakes           
-        } else if (pidBrake) {
+        if (pidBrake) {
             bot.drive.PIDLock(true);
             System.out.println("BaseLocked!");
-            bot.drive.PIDLockIncrement(-.25* leftJoy.getRawAxis(2));
+            bot.drive.PIDLockIncrement(-.125 * leftJoy.getRawAxis(2));
 
 
         } else {
@@ -178,7 +150,6 @@ public class Main extends IterativeRobot {
         }
 
     }
-    
     double turretAngle = 0;
 
     /**
@@ -194,9 +165,6 @@ public class Main extends IterativeRobot {
                 autoAimRFend = false,
                 autoAim = funbox.getDigital(DriverStationUserInterface.PORTS.TURRET_SWITCH_AUTO);
 
-        
-
-
         double shooterSpeed = //4000
                 EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
                 (float) 1.75, (float) 5.0, (float) 500, (float) 3500),
@@ -206,20 +174,9 @@ public class Main extends IterativeRobot {
                 shoot = funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON) && !autoShoot;
 
         boolean manualAim = funbox.getTurretSwitch().equals("MANUAL");
-
-        //System.out.println("FB Raw:" + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
-        //System.out.println("FB Scaled:" + EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0));
-        //System.out.println("Turret Actual:" + Main.bot.turret.getActualPosition());
-
-        //        if (!(autoAimLock || autoAimLFend || autoAimRFend || autoAimKey)) {
-//            manualAim = false;
-//        } else if (funbox.getTurretSwitch().equals("MANUAL")) {
-//            manualAim = true;
-//        }
-
-        //System.out.println("Turret knob: " + funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB));
+        
         if (manualAim) {
-            turretAngle = 
+            turretAngle =
                     EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0);
             bot.turret.setAngle(turretAngle);//TODO: scale to range
         } else if (autoAimLock) {
@@ -263,9 +220,8 @@ public class Main extends IterativeRobot {
                 bot.intake.setIntake(0);
             }
         }
-        
-        bot.aic.enable = !shoot;
 
+        bot.aic.enable = !shoot;
 
         bot.shooter.setHood(hood);
 

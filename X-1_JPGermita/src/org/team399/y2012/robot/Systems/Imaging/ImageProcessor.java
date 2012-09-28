@@ -156,6 +156,12 @@ public class ImageProcessor {
                 distance = 0;
             }
         }
+        
+        public Target(int x, int y, int distance) {
+            this.x = x;
+            this.y = y;
+            this.distance = distance;
+        }
 
         /**
          * Creates a string representation of the target

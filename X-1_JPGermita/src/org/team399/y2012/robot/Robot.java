@@ -5,22 +5,22 @@
 package org.team399.y2012.robot;
 
 import org.team399.y2012.Utilities.DsLcdStream;
-import org.team399.y2012.Utilities.EagleMath;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Controls.Automation.AutoAimController;
 import org.team399.y2012.robot.Controls.Automation.AutoDriveTrain;
 import org.team399.y2012.robot.Controls.Automation.AutoShootController;
 import org.team399.y2012.robot.Controls.Automation.AutoShooterSpeedController;
-import org.team399.y2012.robot.Controls.HumanInterfaceDevices.DriverStationUserInterface;
 import org.team399.y2012.robot.Systems.*;
 import org.team399.y2012.robot.Systems.Imaging.*;
+import edu.wpi.first.wpilibj.Dashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * Class to encapsulate all mechanisms into one class
  * @author Jeremy
  */
 public class Robot {
-
+    public Dashboard comp_dash = DriverStation.getInstance().getDashboardPackerLow();
     public DriveTrain drive;     //Drivetrain Instance
     public Shooter shooter;         //Shooter instance
     public Intake intake;            //Intake instance
@@ -64,15 +64,11 @@ public class Robot {
         shooterSpeedController = new AutoShooterSpeedController();
         shootController = new AutoShootController(shooter, intake, shooterSpeedController);
         adt = new AutoDriveTrain(drive);
-        aic = new AutoAimController(turret, eye);
+        aic = new AutoAimController(turret, eye, drive);
         ps_bot.println("Auto controllers initialized");
-//        ps_bot.println("Excecuting garbage collection...");
-//        System.gc();
         ps_bot.println("Initialization complete!");
         ps_bot.println("Initialization took " + ((double) initStartTime) / 1000 + " seconds!");
         DsLcdStream.printlnMain("Init done! Took " + ((double) initStartTime) / 1000 + " seconds!");
-        //eye.start();
-        
     }
 
     /**
@@ -81,11 +77,20 @@ public class Robot {
      */
     public void run() {
         shooter.update();
-        //eye.run();
-       
-//         DsLcdStream.println1("Shoot Err: " + ((EagleMath.map((float) Main.funbox.getAnalog(DriverStationUserInterface.PORTS.SHOOTER_KNOB),
-//                (float) 1.75, (float) 5.0, (float) 500, (float) 3500)) + shooter.getEncoderRate()) + "          ");
-//         DsLcdStream.println2("Shooter Act: " + shooter.getEncoderRate() + "          ");
         
+        comp_dash.addInt(eye.getNumberOfTargets());
+        comp_dash.addBoolean(false);
+        try {
+            comp_dash.addInt(eye.getHighestTarget().x);
+            comp_dash.addInt(eye.getHighestTarget().y);
+            comp_dash.addDouble(eye.getHighestTarget().calculateDistance());
+        } catch(NullPointerException e) {
+            comp_dash.addInt(0);
+            comp_dash.addInt(0);
+            comp_dash.addDouble(0);
+        }
+        comp_dash.addDouble(shooter.setPointV);
+        comp_dash.addDouble(shooter.getEncoderRate());
+        comp_dash.commit();
     }
 }

@@ -26,7 +26,7 @@ public class DriveTrain {
     private Gyro yaw = new Gyro(RobotIOMap.GYRO_YAW);
     private Gyro pitch = new Gyro(RobotIOMap.GYRO_PITCH);
     private MovingAverage m_pitchFilter = new MovingAverage(8);
-    private RateLimitFilter m_yawFilter = new RateLimitFilter(.1);
+    private RateLimitFilter m_yawFilter = new RateLimitFilter(1);
     private PrintStream ps_drive = new PrintStream("[DRIVE] ");
     
     public double left_power = 0;
@@ -92,8 +92,9 @@ public class DriveTrain {
         }
         ps_drive.println("RightB Initialization Complete!");
         ps_drive.println("CAN Jaguar initialization complete");
+        
         yaw.reset();
-        pitch.reset();
+        //pitch.reset();
 
         ps_drive.println("Gyro initialization complete");
         ps_drive.println("Drivetrain initialization complete!");
@@ -245,9 +246,9 @@ public class DriveTrain {
         double turning = twoStickToTurning(left, right);
 
         //scalar value for turning desensitivity
-        double e_tSens = .70;
+        double e_tSens = .67;
         //Turn limiting scalar, based on throttle
-        double tLim = (1.2 - Math.abs(throttle)) * e_tSens;
+        double tLim = (1.0 - Math.abs(throttle)) * e_tSens;
 
         //High gear
         if (!gear) {

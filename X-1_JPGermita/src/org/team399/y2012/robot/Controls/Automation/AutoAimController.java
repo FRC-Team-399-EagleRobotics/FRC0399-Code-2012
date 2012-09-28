@@ -4,8 +4,9 @@
  */
 package org.team399.y2012.robot.Controls.Automation;
 
-import com.sun.squawk.util.MathUtils;
 import org.team399.y2012.Utilities.EagleMath;
+import org.team399.y2012.Utilities.PulseTriggerBoolean;
+import org.team399.y2012.robot.Systems.DriveTrain;
 import org.team399.y2012.robot.Systems.Imaging.EagleEye;
 import org.team399.y2012.robot.Systems.Turret;
 
@@ -17,14 +18,16 @@ public class AutoAimController {
 
     private Turret m_turret;
     private EagleEye m_eye;
+    private DriveTrain m_drive;
 
     /**
      * Constructor
      * @param turret
      */
-    public AutoAimController(Turret turret, EagleEye eye) {
+    public AutoAimController(Turret turret, EagleEye eye, DriveTrain drive) {
         this.m_turret = turret;
         this.m_eye = eye;
+        this.m_drive = drive;
     }
     public boolean enable = true;
 
@@ -37,35 +40,47 @@ public class AutoAimController {
 
         if (enable) {
             m_eye.run();
-            //DO WORK HERE
-            //if (System.currentTimeMillis() % 100 < 5) {      //Put on a .1 second timer to reduce noise in tracking
             if (m_eye.getHighestTarget() != null) {
-
                 System.out.println("Auto Aim Controller Running!");
                 System.out.println("Number of targets found: " + m_eye.getNumberOfTargets());
-                double targetDistance = m_eye.getHighestTarget().distance;  //Get distance in inches
+//                double targetDistance = m_eye.getHighestTarget().distance;  //Get distance in inches
                 double xErr = 160 - m_eye.getHighestTarget().x;             //Target's distance from the center of view
-                //double angleOffset = MathUtils.atan2(targetDistance, xErr);
                 double angleOffset = EagleMath.map((float) xErr, -160, 160, 45, -45);
-                //angleOffset -= Math.PI/2;
-                //angleOffset *= 57.2957795;
-                //angleOffset /= 2;
                 angleOffset = EagleMath.truncate(angleOffset, 2);
-                System.out.println("Target Distance:     " + targetDistance);
-                System.out.println("Target X Offset:     " + xErr);
-                System.out.println("Target Angle Offset: " + angleOffset);
-
-
+//                System.out.println("Target Distance:     " + targetDistance);
+//                System.out.println("Target X Offset:     " + xErr);
+//                System.out.println("Target Angle Offset: " + angleOffset);
 
                 m_turret.setV((angleOffset * trackingP) - (trackingD * (angleOffset * trackingP)));
             } else {
                 m_turret.setV(0);
+                //autoTurn();
             }
+
         } else {
             m_turret.setV(0);
+            m_eye.framerate = 0;
         }
-        //m_turret.turretPositionLoop();
-        //}
+    }
+
+    private PulseTriggerBoolean autoTurnPulse_front = new PulseTriggerBoolean();
+    private PulseTriggerBoolean autoTurnPulse_back = new PulseTriggerBoolean();
+    private void autoTurn() {
+
+        double botHeading = m_drive.getAngleWraparound();
+        boolean botIsFacingForward = EagleMath.isInBand(botHeading, 0, 90) || EagleMath.isInBand(botHeading, 0, 90);
+        
+        autoTurnPulse_front.set(botIsFacingForward);
+        autoTurnPulse_back.set(!botIsFacingForward);
+        
+        if(autoTurnPulse_front.get()) {
+           //turn turret to front of robot
+        } else if(autoTurnPulse_back.get()) {
+            //turn turret to rear of robot
+        } else {
+            //Stop turret
+        }
+
     }
 
     /**
@@ -113,11 +128,6 @@ public class AutoAimController {
     }
 
     private void setAndLock(double angle) {
-//        if (m_turret.isAtAngle() && Math.abs(m_turret.getSetPosition() - angle) > .5) {
-//            lockOn();
-//        } else {
-//            m_turret.setAngle(angle);
-//        }
         m_turret.setAngleDeg(angle);
     }
 }

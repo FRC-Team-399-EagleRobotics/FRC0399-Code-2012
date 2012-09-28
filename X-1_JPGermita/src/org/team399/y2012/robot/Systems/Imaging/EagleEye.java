@@ -6,6 +6,7 @@ package org.team399.y2012.robot.Systems.Imaging;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Relay;
+import org.team399.y2012.Utilities.EagleMath;
 import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 import org.team399.y2012.robot.Systems.Imaging.ImageProcessor.Target;
@@ -38,19 +39,19 @@ public class EagleEye extends Thread {
      * Constructor
      */
     public EagleEye() {
-        ring = new LightRing(RobotIOMap.LIGHT_RING_R, RobotIOMap.LIGHT_RING_G, RobotIOMap.LIGHT_RING_B); //init light ring
-        ring.setRGB(0, 0, 0);
         cam = new Camera(); //Init camera
-        if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kBlue)) {
-            ring.setRGB(0, 0, 1);
-        } else if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kRed)) {
-            ring.setRGB(1, 0, 0);
-        } else if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kInvalid)) {
-            ring.setRGB(0, 1, 0);
-        }
-        for (double c = 0.0; c < 1.0; c += .01) {
-            ring.setRGB(0, c, 1.0 - c);
-        }
+        ring = new LightRing(RobotIOMap.LIGHT_RING_R, RobotIOMap.LIGHT_RING_G, RobotIOMap.LIGHT_RING_B); //init light ring
+//        ring.setRGB(0, 0, 0);
+//        if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kBlue)) {
+//            ring.setRGB(0, 0, 1);
+//        } else if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kRed)) {
+//            ring.setRGB(1, 0, 0);
+//        } else if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kInvalid)) {
+//            ring.setRGB(0, 1, 0);
+//        }
+//        for (double c = 0.0; c < 1.0; c += .01) {
+//            ring.setRGB(0, c, 1.0 - c);
+//        }
         greenRing.set(Relay.Value.kForward);
         System.out.println("[EAGLE-EYE] Eagle Eye initialized");
     }
@@ -60,27 +61,32 @@ public class EagleEye extends Thread {
     int colorIndex = 0;
     long timeLastTarget = 0;
     boolean enable = true;
+    public double framerate = 0;
 
     /**
      * Main run method. Call this for functionality.
      */
     public void run() {
         //ring.setRGB(0, 1, 0);
-        ring.set(colors[colorIndex]);
+//        ring.set(colors[colorIndex]);
 
         loopCount++;
         if (cam.freshImage() && enable) {
 
-            m_ps.println("Image Processing started...");
+            //m_ps.println("Image Processing started...");
             long procStartTime = System.currentTimeMillis();
+
             targets = ImageProcessor.processImage(cam.getImage(), thresholds[0]);    //Process image from camera using given thresholds
+
             long timeElapsed = (System.currentTimeMillis() - procStartTime);
-            m_ps.println("Image processing complete!");
-            m_ps.println("Image Processing took " + timeElapsed + " ms.");
+            //m_ps.println("Image processing complete!");
+            //m_ps.println("Image Processing took " + timeElapsed + " ms.");
+            framerate = EagleMath.truncate((1000.0 / (double)timeElapsed), 3);
+            m_ps.println("Processing Images at " + framerate + " fps");
             if (targets != null && targets.length > 0) {    //If targets are detected
 
                 targetsFound = true;                        //Set flag to true
-                System.out.println("[EAGLE-EYE] Targets Found!!! " + targets.length);   //Print number of targets
+                //System.out.println("[EAGLE-EYE] Targets Found!!! " + targets.length);   //Print number of targets
                 timeLastTarget = System.currentTimeMillis();
             } else {
                 targetsFound = false;
@@ -89,6 +95,8 @@ public class EagleEye extends Thread {
 //                    colorIndex = (colorIndex > colors.length) ? 0 : colorIndex;
 //                }
             }
+        } else {
+            framerate = 0;
         }
     }
 
@@ -126,7 +134,7 @@ public class EagleEye extends Thread {
      */
     public Target getHighestTarget() {
         if (targets == null) {
-            return null;
+            return null;// new Target(0,0,0);
         }
         Target highest = targets[0];
         for (int i = 1; i < targets.length; i++) {
@@ -145,7 +153,7 @@ public class EagleEye extends Thread {
         long timer = System.currentTimeMillis();
         timer = timer % 16500;
         //timer = timer % 5000;
-        ring.setHSL((float) (timer / 13.888888), 255.0, 100.0);
+//        ring.setHSL((float) (timer / 13.888888), 255.0, 100.0);
         //ring.setRGB(Math.sin((double)(timer/5000) * (2*Math.PI)), Math.cos((double)(timer/5000) * (2*Math.PI)), Math.sin((timer/5000) + (2*Math.PI)));
 //
 //        Color[] patriotic = {
