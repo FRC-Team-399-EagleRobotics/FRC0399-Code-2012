@@ -23,6 +23,7 @@ public class EagleEye extends Thread {
     public Camera cam;
     private Target[] targets;
     private PrintStream m_ps = new PrintStream("[EAGLE-EYE] ");
+    boolean m_run = true;   //Flag to enable/disable execution in the thread
     //Color Thresholds
     Color[] colors = {
         Color.fromRGB(0, 1, 0), //Green color
@@ -39,7 +40,7 @@ public class EagleEye extends Thread {
      * Constructor
      */
     public EagleEye() {
-        cam = new Camera(); //Init camera
+        
         ring = new LightRing(RobotIOMap.LIGHT_RING_R, RobotIOMap.LIGHT_RING_G, RobotIOMap.LIGHT_RING_B); //init light ring
 //        ring.setRGB(0, 0, 0);
 //        if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kBlue)) {
@@ -61,7 +62,12 @@ public class EagleEye extends Thread {
     int colorIndex = 0;
     long timeLastTarget = 0;
     boolean enable = true;
+    boolean idle = false;
     public double framerate = 0;
+    
+    public void init() {
+        cam = new Camera(); //Init camera
+    }
 
     /**
      * Main run method. Call this for functionality.
@@ -69,47 +75,70 @@ public class EagleEye extends Thread {
     public void run() {
         //ring.setRGB(0, 1, 0);
 //        ring.set(colors[colorIndex]);
+        
+        init();
 
-        loopCount++;
-        if (cam.freshImage() && enable) {
+        while (m_run) {
+            loopCount++;
+            if (cam.freshImage() && enable) {
 
-            //m_ps.println("Image Processing started...");
-            long procStartTime = System.currentTimeMillis();
+                //m_ps.println("Image Processing started...");
+                long procStartTime = System.currentTimeMillis();
 
-            targets = ImageProcessor.processImage(cam.getImage(), thresholds[0]);    //Process image from camera using given thresholds
+                targets = ImageProcessor.processImage(cam.getImage(), thresholds[0]);    //Process image from camera using given thresholds
 
-            long timeElapsed = (System.currentTimeMillis() - procStartTime);
-            //m_ps.println("Image processing complete!");
-            //m_ps.println("Image Processing took " + timeElapsed + " ms.");
-            framerate = EagleMath.truncate((1000.0 / (double)timeElapsed), 3);
-            m_ps.println("Processing Images at " + framerate + " fps");
-            if (targets != null && targets.length > 0) {    //If targets are detected
+                long timeElapsed = (System.currentTimeMillis() - procStartTime);
+                //m_ps.println("Image processing complete!");
+                //m_ps.println("Image Processing took " + timeElapsed + " ms.");
+                framerate = EagleMath.truncate((1000.0 / (double) timeElapsed), 3);
+                m_ps.println("Processing Images at " + framerate + " fps");
+                if (targets != null && targets.length > 0) {    //If targets are detected
 
-                targetsFound = true;                        //Set flag to true
-                //System.out.println("[EAGLE-EYE] Targets Found!!! " + targets.length);   //Print number of targets
-                timeLastTarget = System.currentTimeMillis();
+                    targetsFound = true;                        //Set flag to true
+                    //System.out.println("[EAGLE-EYE] Targets Found!!! " + targets.length);   //Print number of targets
+                    timeLastTarget = System.currentTimeMillis();
+                } else {
+                    targetsFound = false;
+                    //                if ((System.currentTimeMillis()- timeLastTarget) % 5000 < 4950) {
+                    //                    colorIndex++;
+                    //                    colorIndex = (colorIndex > colors.length) ? 0 : colorIndex;
+                    //                }
+                    try {
+                        Thread.sleep(250);      //Sleep for 250ms if no target found initially. keep load down if no targets immediately found
+                    } catch (Exception e) {
+                    }
+                }
             } else {
-                targetsFound = false;
-//                if ((System.currentTimeMillis()- timeLastTarget) % 5000 < 4950) {
-//                    colorIndex++;
-//                    colorIndex = (colorIndex > colors.length) ? 0 : colorIndex;
-//                }
+                framerate = 0;
             }
-        } else {
-            framerate = 0;
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
+            }
+            
+            if(idle) {
+                try {
+                        Thread.sleep(750);      //Sleep for 250ms if no target found initially. keep load down if no targets immediately found
+                    } catch (Exception e) {
+                    }
+            }
         }
     }
 
-    public void enable(boolean en) {
+    public synchronized void enable(boolean en) {
         enable = en;
     }
 
-    public int getNumberOfTargets() {
+    public synchronized int getNumberOfTargets() {
         try {
             return getTargets().length;
         } catch (Exception e) {
             return 0;
         }
+    }
+    
+    public synchronized void setIdle(boolean id) {
+        this.idle = id;
     }
 
     /**

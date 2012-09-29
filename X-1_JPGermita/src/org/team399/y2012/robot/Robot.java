@@ -55,10 +55,11 @@ public class Robot {
         //Turret instantiation
         turret = new Turret();        
         ps_bot.println("Turret initialized!");
+        eye = new EagleEye();        
+        eye.start();
+        ps_bot.println("Vision initialized!");
          
         //Eagle Eye Instantiation
-        eye = new EagleEye();        
-        ps_bot.println("Vision initialized!");
         ps_bot.println("Systems Initialized");
         
         shooterSpeedController = new AutoShooterSpeedController();
@@ -69,6 +70,8 @@ public class Robot {
         ps_bot.println("Initialization complete!");
         ps_bot.println("Initialization took " + ((double) initStartTime) / 1000 + " seconds!");
         DsLcdStream.printlnMain("Init done! Took " + ((double) initStartTime) / 1000 + " seconds!");
+        
+        
     }
 
     /**

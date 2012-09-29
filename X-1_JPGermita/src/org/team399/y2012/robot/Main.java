@@ -21,9 +21,8 @@ import org.team399.y2012.robot.Controls.Autonomous.HighGearBothBridges;
 public class Main extends IterativeRobot {
 
     public static Robot bot;
-    Compressor comp = new Compressor(4, 1);
-    Joystick leftJoy = new Joystick(1);
-    Joystick rightJoy = new Joystick(2);
+    Compressor comp = new Compressor(4, 1);     //Compressor on digital in port 4 and relay port 1
+    Joystick gamepad = new Joystick(1);         //Gamepad
     public static DriverStationUserInterface funbox = new DriverStationUserInterface();
     int auto = 0;
 
@@ -130,18 +129,18 @@ public class Main extends IterativeRobot {
      * Driver's routine. Edit driver controls here
      */
     public void drive() {
-        double leftPower = leftJoy.getRawAxis(2), //Variables to customize controls easily
-                rightPower = -leftJoy.getRawAxis(4);
-        boolean shift = leftJoy.getRawButton(8),
-                intake = leftJoy.getRawButton(7),
-                pidBrake = leftJoy.getRawButton(10);
+        double leftPower = gamepad.getRawAxis(2), //Variables to customize controls easily
+                rightPower = -gamepad.getRawAxis(4);
+        boolean shift = gamepad.getRawButton(8),
+                intake = gamepad.getRawButton(7),
+                pidBrake = gamepad.getRawButton(10);
 //DROPPER
         bot.intake.setDropper(intake);
 //LOW Gear        
         if (pidBrake) {
             bot.drive.PIDLock(true);
             System.out.println("BaseLocked!");
-            bot.drive.PIDLockIncrement(-.125 * leftJoy.getRawAxis(2));
+            bot.drive.PIDLockIncrement(-.125 * gamepad.getRawAxis(2));
 
 
         } else {
@@ -193,6 +192,7 @@ public class Main extends IterativeRobot {
         }
 
         if (shoot) {
+            comp.stop();
             bot.shooter.setVelocity(shooterSpeed);
 
 
@@ -212,13 +212,14 @@ public class Main extends IterativeRobot {
         } else {
             bot.shooter.setVelocity(0);
 
-            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON) || leftJoy.getRawButton(6)) {
+            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON) || gamepad.getRawButton(6)) {
                 bot.intake.setIntake(-intakeSpeed);
-            } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON) || leftJoy.getRawButton(5)) {
+            } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON) || gamepad.getRawButton(5)) {
                 bot.intake.setIntake(intakeSpeed);
             } else {
                 bot.intake.setIntake(0);
             }
+            comp.start();
         }
 
         bot.aic.enable = !shoot;

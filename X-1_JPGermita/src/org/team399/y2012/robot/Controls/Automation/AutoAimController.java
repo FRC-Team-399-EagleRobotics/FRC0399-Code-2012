@@ -38,8 +38,9 @@ public class AutoAimController {
     public void lockOn() {
         double trackingP = -.02525, trackingD = .04;
 
+        m_eye.setIdle(enable);
         if (enable) {
-            m_eye.run();
+//            m_eye.run();
             if (m_eye.getHighestTarget() != null) {
                 System.out.println("Auto Aim Controller Running!");
                 System.out.println("Number of targets found: " + m_eye.getNumberOfTargets());
