@@ -36,16 +36,22 @@ public class AutoAimController {
      * Will not do anything if no target found
      */
     public void lockOn() {
-        double trackingP = -.02525, trackingD = .04;
+        double trackingP = -.020, trackingD = .08;
 
-        m_eye.setIdle(enable);
+        
         if (enable) {
-//            m_eye.run();
             if (m_eye.getHighestTarget() != null) {
+                double xErr = 160 - m_eye.getHighestTarget().x;             //Target's distance from the center of view
+                if(Math.abs(xErr) < 10) {
+                    m_eye.setIdle(true);
+                } else {
+                    m_eye.setIdle(false);
+                }
+                
                 System.out.println("Auto Aim Controller Running!");
                 System.out.println("Number of targets found: " + m_eye.getNumberOfTargets());
 //                double targetDistance = m_eye.getHighestTarget().distance;  //Get distance in inches
-                double xErr = 160 - m_eye.getHighestTarget().x;             //Target's distance from the center of view
+                
                 double angleOffset = EagleMath.map((float) xErr, -160, 160, 45, -45);
                 angleOffset = EagleMath.truncate(angleOffset, 2);
 //                System.out.println("Target Distance:     " + targetDistance);
@@ -55,6 +61,7 @@ public class AutoAimController {
                 m_turret.setV((angleOffset * trackingP) - (trackingD * (angleOffset * trackingP)));
             } else {
                 m_turret.setV(0);
+                m_eye.setIdle(true);
                 //autoTurn();
             }
 

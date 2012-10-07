@@ -110,6 +110,7 @@ public class Main extends IterativeRobot {
     }
 
     public void teleopInit() {
+        multiplier = 0.6;
     }
 
     /**
@@ -124,13 +125,18 @@ public class Main extends IterativeRobot {
     public void teleopContinuous() {
         bot.run();  //Basic robot functions that run continuously    
     }
+    double multiplier = 0.6;
 
     /**
      * Driver's routine. Edit driver controls here
      */
     public void drive() {
-        double leftPower = gamepad.getRawAxis(2), //Variables to customize controls easily
-                rightPower = -gamepad.getRawAxis(4);
+
+        if (gamepad.getRawButton(4)) {
+            multiplier = 1.0;
+        }
+        double leftPower = gamepad.getRawAxis(2) * multiplier, //Variables to customize controls easily
+                rightPower = -gamepad.getRawAxis(4) * multiplier;
         boolean shift = gamepad.getRawButton(8),
                 intake = gamepad.getRawButton(7),
                 pidBrake = gamepad.getRawButton(10);
@@ -173,11 +179,12 @@ public class Main extends IterativeRobot {
                 shoot = funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON) && !autoShoot;
 
         boolean manualAim = funbox.getTurretSwitch().equals("MANUAL");
-        
+
         if (manualAim) {
             turretAngle =
                     EagleMath.map((float) funbox.getAnalog(DriverStationUserInterface.PORTS.TURRET_KNOB), (float) 5.0, (float) 1.75, (float) 9.6, (float) 1.0);
             bot.turret.setAngle(turretAngle);//TODO: scale to range
+            bot.eye.enable(false);
         } else if (autoAimLock) {
             bot.aic.lockOn();
         } else if (autoAimLFend) {
@@ -186,9 +193,11 @@ public class Main extends IterativeRobot {
             bot.aic.rightFender();
         } else if (autoAim) {
             bot.aic.lockOn();
-
+            bot.aic.enable = true;
+            bot.eye.enable(true);
         } else if (funbox.getDigital(DriverStationUserInterface.PORTS.TURRET_SWITCH_OFF)) {
             bot.turret.setV(0);
+            bot.eye.enable(false);
         }
 
         if (shoot) {
@@ -221,8 +230,7 @@ public class Main extends IterativeRobot {
             }
             comp.start();
         }
-
-        bot.aic.enable = !shoot;
+        //bot.eye.setIdle(shoot);
 
         bot.shooter.setHood(hood);
 

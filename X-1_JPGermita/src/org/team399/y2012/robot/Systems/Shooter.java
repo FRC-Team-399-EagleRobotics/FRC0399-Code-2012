@@ -135,6 +135,7 @@ public class Shooter extends Thread {
      * @param K Feed forward scalar value. This value varies based on the setpoint. may not be linear. 
      */
     public void update(double P, double I, double D, double K) {
+        long startTime = System.currentTimeMillis();
 
         prevPrevErr = prevErr;
         prevErr = err;
@@ -177,6 +178,8 @@ public class Shooter extends Thread {
 //        pidDash.addDouble(err);
 //        pidDash.commit();
         shoot();
+        long timeElapsed = System.currentTimeMillis() - startTime;
+        m_print.println("Running shooter control loop at " + 1000/(double)timeElapsed + " Hz");
     }
 
     private void shoot() {

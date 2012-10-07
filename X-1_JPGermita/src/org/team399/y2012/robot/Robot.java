@@ -81,19 +81,19 @@ public class Robot {
     public void run() {
         shooter.update();
         
-        comp_dash.addInt(eye.getNumberOfTargets());
-        comp_dash.addBoolean(false);
-        try {
-            comp_dash.addInt(eye.getHighestTarget().x);
-            comp_dash.addInt(eye.getHighestTarget().y);
-            comp_dash.addDouble(eye.getHighestTarget().calculateDistance());
-        } catch(NullPointerException e) {
-            comp_dash.addInt(0);
-            comp_dash.addInt(0);
-            comp_dash.addDouble(0);
-        }
-        comp_dash.addDouble(shooter.setPointV);
-        comp_dash.addDouble(shooter.getEncoderRate());
-        comp_dash.commit();
+//        comp_dash.addInt(eye.getNumberOfTargets());
+//        comp_dash.addBoolean(false);
+//        try {
+//            comp_dash.addDouble((double)eye.getHighestTarget().x);
+//            comp_dash.addDouble((double)eye.getHighestTarget().y);
+//            comp_dash.addDouble(eye.getHighestTarget().calculateDistance());
+//        } catch(NullPointerException e) {
+//            comp_dash.addDouble(0);
+//            comp_dash.addDouble(0);
+//            comp_dash.addDouble(0);
+//        }
+//        comp_dash.addDouble(shooter.setPointV);
+//        comp_dash.addDouble(shooter.getEncoderRate());
+//        comp_dash.commit();
     }
 }

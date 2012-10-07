@@ -76,6 +76,8 @@ public class EagleEye extends Thread {
         //ring.setRGB(0, 1, 0);
 //        ring.set(colors[colorIndex]);
         
+        //Todo: look into not checking past the highest target
+        
         init();
 
         while (m_run) {
@@ -118,7 +120,7 @@ public class EagleEye extends Thread {
             
             if(idle) {
                 try {
-                        Thread.sleep(750);      //Sleep for 250ms if no target found initially. keep load down if no targets immediately found
+                        Thread.sleep(750);      //Sleep for 750ms if no target found initially. keep load down if no targets immediately found
                     } catch (Exception e) {
                     }
             }
@@ -162,6 +164,8 @@ public class EagleEye extends Thread {
      * @return 
      */
     public Target getHighestTarget() {
+        //this might be redundant
+        
         if (targets == null) {
             return null;// new Target(0,0,0);
         }
