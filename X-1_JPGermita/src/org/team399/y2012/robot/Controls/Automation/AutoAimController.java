@@ -42,11 +42,11 @@ public class AutoAimController {
         if (enable) {
             if (m_eye.getHighestTarget() != null) {
                 double xErr = 160 - m_eye.getHighestTarget().x;             //Target's distance from the center of view
-                if(Math.abs(xErr) < 10) {
-                    m_eye.setIdle(true);
-                } else {
-                    m_eye.setIdle(false);
-                }
+//                if(Math.abs(xErr) < 10) {
+//                    m_eye.setIdle(true);
+//                } else {
+//                    m_eye.setIdle(false);
+//                }
                 
                 System.out.println("Auto Aim Controller Running!");
                 System.out.println("Number of targets found: " + m_eye.getNumberOfTargets());
@@ -61,7 +61,7 @@ public class AutoAimController {
                 m_turret.setV((angleOffset * trackingP) - (trackingD * (angleOffset * trackingP)));
             } else {
                 m_turret.setV(0);
-                m_eye.setIdle(true);
+                //m_eye.setIdle(true);
                 //autoTurn();
             }
 

@@ -179,7 +179,7 @@ public class Shooter extends Thread {
 //        pidDash.commit();
         shoot();
         long timeElapsed = System.currentTimeMillis() - startTime;
-        m_print.println("Running shooter control loop at " + 1000/(double)timeElapsed + " Hz");
+       // m_print.println("Running shooter control loop at " + 1000/(double)timeElapsed + " Hz");
     }
 
     private void shoot() {

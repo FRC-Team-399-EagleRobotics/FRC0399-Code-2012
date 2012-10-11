@@ -23,6 +23,8 @@ public class Main extends IterativeRobot {
     public static Robot bot;
     Compressor comp = new Compressor(4, 1);     //Compressor on digital in port 4 and relay port 1
     Joystick gamepad = new Joystick(1);         //Gamepad
+    Joystick leftJoy = new Joystick(1);
+    Joystick rightJoy = new Joystick(2);
     public static DriverStationUserInterface funbox = new DriverStationUserInterface();
     int auto = 0;
 
@@ -125,32 +127,60 @@ public class Main extends IterativeRobot {
     public void teleopContinuous() {
         bot.run();  //Basic robot functions that run continuously    
     }
-    double multiplier = 0.6;
+    double multiplier = 1.0;
 
     /**
      * Driver's routine. Edit driver controls here
      */
     public void drive() {
 
-        if (gamepad.getRawButton(4)) {
-            multiplier = 1.0;
+        double leftPower = 0, //Variables to customize controls easily
+                rightPower = 0,
+                pidBrakeCrawl = 0;;
+        boolean shift = false,
+                intake = false,
+                pidBrake = false;
+        if(!funbox.getDigital(3)) {
+            
+            leftPower = gamepad.getRawAxis(2);
+            rightPower = -gamepad.getRawAxis(4);
+            shift = gamepad.getRawButton(8);
+            intake = gamepad.getRawButton(7);
+            pidBrake = gamepad.getRawButton(10);
+            pidBrakeCrawl = leftPower;
+            
+        } else if(!funbox.getDigital(1)) {
+            
+            leftPower = leftJoy.getRawAxis(2);
+            rightPower = -rightJoy.getRawAxis(2);
+            shift = rightJoy.getRawButton(1);
+            intake = leftJoy.getRawButton(1);
+            pidBrake = rightJoy.getRawButton(2);
+            pidBrakeCrawl = leftPower;
+        } if(funbox.getDigital(1) && funbox.getDigital(3)) {
+            
+            leftPower = gamepad.getRawAxis(2);
+            rightPower = -gamepad.getRawAxis(4);
+            shift = gamepad.getRawButton(8);
+            intake = gamepad.getRawButton(7);
+            pidBrake = gamepad.getRawButton(10);
+            pidBrakeCrawl = leftPower;
+            
         }
-        double leftPower = gamepad.getRawAxis(2) * multiplier, //Variables to customize controls easily
-                rightPower = -gamepad.getRawAxis(4) * multiplier;
-        boolean shift = gamepad.getRawButton(8),
-                intake = gamepad.getRawButton(7),
-                pidBrake = gamepad.getRawButton(10);
 //DROPPER
         bot.intake.setDropper(intake);
 //LOW Gear        
         if (pidBrake) {
             bot.drive.PIDLock(true);
             System.out.println("BaseLocked!");
-            bot.drive.PIDLockIncrement(-.125 * gamepad.getRawAxis(2));
-
-
+            bot.drive.PIDLockIncrement(-.125 * pidBrakeCrawl);
         } else {
+            if(!funbox.getDigital(3)) {
             bot.drive.iCantBelieveItsNotButterDrive(leftPower, -rightPower, shift);
+            } else {
+                bot.drive.tankDrive(leftPower, rightPower);
+                bot.drive.shift(shift);
+            }
             bot.drive.PIDLock(false);
         }
 
@@ -161,6 +191,7 @@ public class Main extends IterativeRobot {
      * Operator routine. edit operator controls here
      */
     public void operate() {
+        
 
         boolean autoShoot = funbox.getShooterSwitch().equals("AUTO")
                 && funbox.getDigital(DriverStationUserInterface.PORTS.SHOOT_BUTTON),
@@ -193,13 +224,14 @@ public class Main extends IterativeRobot {
             bot.aic.rightFender();
         } else if (autoAim) {
             bot.aic.lockOn();
-            bot.aic.enable = true;
-            bot.eye.enable(true);
+            
+//            bot.eye.enable(true);
         } else if (funbox.getDigital(DriverStationUserInterface.PORTS.TURRET_SWITCH_OFF)) {
             bot.turret.setV(0);
             bot.eye.enable(false);
         }
 
+        
         if (shoot) {
             comp.stop();
             bot.shooter.setVelocity(shooterSpeed);
@@ -212,6 +244,9 @@ public class Main extends IterativeRobot {
             } else {
                 bot.intake.setIntake(0);
             }
+            
+            bot.eye.enable(false);
+            bot.aic.enable = false;
         } else if (autoShoot) {
             if (!autoSpeed) {
                 bot.shootController.shoot(shooterSpeed, -1);
@@ -228,7 +263,10 @@ public class Main extends IterativeRobot {
             } else {
                 bot.intake.setIntake(0);
             }
+            bot.eye.enable(true);
             comp.start();
+            bot.eye.setIdle(false);
+            bot.aic.enable = true;
         }
         //bot.eye.setIdle(shoot);
 

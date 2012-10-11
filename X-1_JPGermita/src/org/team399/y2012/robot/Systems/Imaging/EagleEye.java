@@ -31,7 +31,7 @@ public class EagleEye extends Thread {
         Color.fromRGB(0, 0, 1) //blue color
     }; //Colors
     Threshold[] thresholds = {
-        new Threshold(105, 130, 50, 255, 80, 255), //Green threshold
+        new Threshold(105, 130, 40, 255, 60, 255), //Green threshold
         new Threshold(0, 45, 80, 255, 120, 255), //Red threshold
         new Threshold(200, 240, 80, 255, 120, 255) //Blue threshold
     };
@@ -140,6 +140,11 @@ public class EagleEye extends Thread {
     }
     
     public synchronized void setIdle(boolean id) {
+        if(id) {
+            System.out.println("EagleEYe idle!");
+        } else {
+            System.out.println("EagleEYe active!");
+        }
         this.idle = id;
     }
 
