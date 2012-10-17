@@ -263,10 +263,10 @@ public class Main extends IterativeRobot {
             } else {
                 bot.intake.setIntake(0);
             }
-            bot.eye.enable(true);
+            //bot.eye.enable(true);
             comp.start();
-            bot.eye.setIdle(false);
-            bot.aic.enable = true;
+            //bot.eye.setIdle(false);
+            //bot.aic.enable = true;
         }
         //bot.eye.setIdle(shoot);
 

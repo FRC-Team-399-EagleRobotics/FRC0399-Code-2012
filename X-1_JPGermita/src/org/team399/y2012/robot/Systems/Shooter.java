@@ -11,6 +11,7 @@ import org.team399.y2012.Utilities.PrintStream;
 import org.team399.y2012.robot.Config.RobotIOMap;
 import edu.wpi.first.wpilibj.Dashboard;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotDrive;
 
 /**
  * This class encapsulates the two motors and pneumatic actuator
@@ -44,6 +45,7 @@ public class Shooter extends Thread {
     public Shooter() {
         m_print.println("Shooter Initialization started...");
         m_print.println("ShooterA Initialization started...");
+        
         try {
 
             //Encoder enabled shooter jag setup: MUST FOLLOW THIS SEQUENCE OR ENCODER OR MOTOR WILL NOT WORK
@@ -98,6 +100,8 @@ public class Shooter extends Thread {
             if (Math.abs(vel) < 50) {
                 vel = 0;
             }
+            
+            m_print.println("Velocity: " + vel);
 
             return vel; //* scalar;              //Scales value to reasonable values
         } catch (Exception e) {
@@ -167,6 +171,7 @@ public class Shooter extends Thread {
         if (out > 1) {  //Clamping the output to +- 1
             out = 1;
         }
+        
 //
 //        pidDash.addDouble(setPointV);
 //        pidDash.addDouble(vel);
@@ -230,7 +235,7 @@ public class Shooter extends Thread {
      * @param state true for up, false for down.
      */
     public void setHood(boolean state) {
-        m_hood.set(state);
+        m_hood.set(!state);
     }
 
     public void print() {

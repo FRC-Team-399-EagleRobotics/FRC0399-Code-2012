@@ -23,7 +23,9 @@ public class Camera {
             try {
                 camera = AxisCamera.getInstance();
                 camera.writeResolution(AxisCamera.ResolutionT.k320x240);
+                //camera.writeExposureControl(AxisCamera.ExposureT.automatic);
                 camera.writeExposurePriority(AxisCamera.ExposurePriorityT.frameRate);
+                
 
             } catch (Exception e) {
                 System.err.println("[CAMERA]Error initializing");

@@ -31,7 +31,7 @@ public class EagleEye extends Thread {
         Color.fromRGB(0, 0, 1) //blue color
     }; //Colors
     Threshold[] thresholds = {
-        new Threshold(105, 130, 40, 255, 60, 255), //Green threshold
+        new Threshold(103, 130, 60, 255, 60, 255), //Green threshold
         new Threshold(0, 45, 80, 255, 120, 255), //Red threshold
         new Threshold(200, 240, 80, 255, 120, 255) //Blue threshold
     };
@@ -40,7 +40,7 @@ public class EagleEye extends Thread {
      * Constructor
      */
     public EagleEye() {
-        
+
         ring = new LightRing(RobotIOMap.LIGHT_RING_R, RobotIOMap.LIGHT_RING_G, RobotIOMap.LIGHT_RING_B); //init light ring
 //        ring.setRGB(0, 0, 0);
 //        if (DriverStation.getInstance().getAlliance().equals(DriverStation.Alliance.kBlue)) {
@@ -64,9 +64,11 @@ public class EagleEye extends Thread {
     boolean enable = true;
     boolean idle = false;
     public double framerate = 0;
-    
+
     public void init() {
         cam = new Camera(); //Init camera
+        m_ps.println("Vision thread started...");
+
     }
 
     /**
@@ -75,9 +77,9 @@ public class EagleEye extends Thread {
     public void run() {
         //ring.setRGB(0, 1, 0);
 //        ring.set(colors[colorIndex]);
-        
+
         //Todo: look into not checking past the highest target
-        
+
         init();
 
         while (m_run) {
@@ -93,7 +95,7 @@ public class EagleEye extends Thread {
                 //m_ps.println("Image processing complete!");
                 //m_ps.println("Image Processing took " + timeElapsed + " ms.");
                 framerate = EagleMath.truncate((1000.0 / (double) timeElapsed), 3);
-                m_ps.println("Processing Images at " + framerate + " fps");
+                //m_ps.println("Processing Images at " + framerate + " fps");
                 if (targets != null && targets.length > 0) {    //If targets are detected
 
                     targetsFound = true;                        //Set flag to true
@@ -117,12 +119,12 @@ public class EagleEye extends Thread {
                 Thread.sleep(10);
             } catch (Exception e) {
             }
-            
-            if(idle) {
+
+            if (idle) {
                 try {
-                        Thread.sleep(750);      //Sleep for 750ms if no target found initially. keep load down if no targets immediately found
-                    } catch (Exception e) {
-                    }
+                    Thread.sleep(750);      //Sleep for 750ms if no target found initially. keep load down if no targets immediately found
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -138,12 +140,18 @@ public class EagleEye extends Thread {
             return 0;
         }
     }
-    
+
     public synchronized void setIdle(boolean id) {
-        if(id) {
-            System.out.println("EagleEYe idle!");
-        } else {
-            System.out.println("EagleEYe active!");
+//        if(id) {
+//            System.out.println("EagleEye idle!");
+//        } else {
+//            System.out.println("EagleEye active!");
+//        }
+
+        if (!id && idle) {
+            m_ps.println("Setting to idle...");
+        } else if (id && !idle) {
+            m_ps.println("Setting to active!");
         }
         this.idle = id;
     }
@@ -170,7 +178,7 @@ public class EagleEye extends Thread {
      */
     public Target getHighestTarget() {
         //this might be redundant
-        
+
         if (targets == null) {
             return null;// new Target(0,0,0);
         }
