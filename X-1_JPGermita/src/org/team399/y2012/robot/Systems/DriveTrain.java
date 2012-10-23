@@ -246,12 +246,12 @@ public class DriveTrain {
         double turning = twoStickToTurning(left, right);
 
         //scalar value for turning desensitivity
-        double e_tSens = .6;
+        double e_tSens = .9;
         //Turn limiting scalar, based on throttle
         if(Math.abs(turning) > .8) {
             e_tSens = 1.0;
         }
-        double tLim =e_tSens; //(1.0 - Math.abs(throttle)) * e_tSens;
+        double tLim = e_tSens; //(1.0 - Math.abs(throttle)) * e_tSens;
 
         //High gear
         if (!gear) {

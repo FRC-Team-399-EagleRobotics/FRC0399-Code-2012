@@ -37,9 +37,10 @@ public class Feed {
         
         
         // Set shooter                                
-        Main.bot.shooter.update();                                
-        Main.bot.shooter.setVelocity(RPM);                   
+//        Main.bot.shooter.update();                                
+//        Main.bot.shooter.setVelocity(RPM);                   
      
+        Main.bot.shooter.voltageControl(RPM);
         
         //grab current turret postion and hold it!
          Main.bot.turret.setV(0);

@@ -39,7 +39,7 @@ public class ShootTwoBalls {
         // Set shooter                                
         Main.bot.shooter.update();
         Main.bot.shooter.setVelocity(RPM);
-
+        //Main.bot.shooter.voltageControl(RPM);
         //Hood up
         Main.bot.shooter.setHood(true);
 
@@ -71,10 +71,11 @@ public class ShootTwoBalls {
             Main.bot.intake.setIntake(-1);
         }
 
-        //stop conveyor and shooter
-        if (System.currentTimeMillis() - startTime > stopshoot * 1000) {
-            Main.bot.intake.setIntake(0);
-            Main.bot.shooter.setVelocity(0);
-        }
+//        //stop conveyor and shooter
+//        if (System.currentTimeMillis() - startTime > stopshoot * 1000) {
+//            Main.bot.intake.setIntake(0);
+//            Main.bot.shooter.setVelocity(0);
+//            
+//        }
     }
 }

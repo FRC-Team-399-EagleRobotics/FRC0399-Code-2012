@@ -12,6 +12,7 @@ import org.team399.y2012.robot.Config.RobotIOMap;
 import edu.wpi.first.wpilibj.Dashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotDrive;
+import org.team399.y2012.Utilities.EagleMath;
 
 /**
  * This class encapsulates the two motors and pneumatic actuator
@@ -55,8 +56,10 @@ public class Shooter extends Thread {
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);   //Change mode to percent vbus
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPosition);      //Change mode to position mode
             m_shooterA.setPositionReference(CANJaguar.PositionReference.kQuadEncoder);//Change position reference to encoder
-            m_shooterA.configEncoderCodesPerRev(360);                           //set Encoder type
+            m_shooterA.configEncoderCodesPerRev(100);                           //set Encoder type
             m_shooterA.changeControlMode(CANJaguar.ControlMode.kPercentVbus);   //Back to percent vbus mode
+            //m_shooterA.changeControlMode(CANJaguar.ControlMode.kVoltage);
+            
             m_shooterA.configFaultTime(.5);                                     //Half second fault time to minimize down time in case of fault
         } catch (Exception e) {
             System.err.println("[SHOOTER-A]Error initializing");
@@ -69,7 +72,8 @@ public class Shooter extends Thread {
             m_shooterB.configNeutralMode(CANJaguar.NeutralMode.kCoast);
             m_shooterB.changeControlMode(CANJaguar.ControlMode.kPercentVbus);
             m_shooterB.setVoltageRampRate(DEFAULT_VRAMP_RATE);
-            m_shooterA.configFaultTime(.5);
+            m_shooterB.configFaultTime(.5);
+            //m_shooterB.changeControlMode(CANJaguar.ControlMode.kVoltage);
         } catch (Exception e) {
             System.err.println("[SHOOTER-B]Error initializing");
             e.printStackTrace();
@@ -185,6 +189,25 @@ public class Shooter extends Thread {
         shoot();
         long timeElapsed = System.currentTimeMillis() - startTime;
        // m_print.println("Running shooter control loop at " + 1000/(double)timeElapsed + " Hz");
+    }
+    
+    public void voltageControl(double rpm) {
+        double maxRPM = 3500.0;
+        
+        double minVoltage = 2.0;
+        double maxVoltage = 12.0;
+        
+        double output = 0.0;
+        
+        //Todo: some scaling in here for the input
+        //For now, let's assume the rpm per volt is linear for the motors
+        output = EagleMath.map((float) rpm, 0, 3500, 0, 1);
+        try { 
+            setWheelVoltage(output);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        
     }
 
     private void shoot() {

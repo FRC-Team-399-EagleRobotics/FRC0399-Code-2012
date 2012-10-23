@@ -142,11 +142,17 @@ public class Main extends IterativeRobot {
                 pidBrake = false;
         if(!funbox.getDigital(3)) {
             
-            leftPower = gamepad.getRawAxis(2);
-            rightPower = -gamepad.getRawAxis(4);
-            shift = gamepad.getRawButton(8);
-            intake = gamepad.getRawButton(7);
-            pidBrake = gamepad.getRawButton(10);
+//            leftPower = gamepad.getRawAxis(2);
+//            rightPower = -gamepad.getRawAxis(4);
+//            shift = gamepad.getRawButton(8);
+//            intake = gamepad.getRawButton(7);
+//            pidBrake = gamepad.getRawButton(10);
+//            pidBrakeCrawl = leftPower;
+            leftPower = leftJoy.getRawAxis(2);
+            rightPower = -rightJoy.getRawAxis(2);
+            shift = rightJoy.getRawButton(1);
+            intake = leftJoy.getRawButton(1);
+            pidBrake = rightJoy.getRawButton(2);
             pidBrakeCrawl = leftPower;
             
         } else if(!funbox.getDigital(1)) {
@@ -235,6 +241,8 @@ public class Main extends IterativeRobot {
         if (shoot) {
             comp.stop();
             bot.shooter.setVelocity(shooterSpeed);
+            //bot.shooter.voltageControl(shooterSpeed);
+            bot.shooter.update();
 
 
             if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON)) {
@@ -248,17 +256,14 @@ public class Main extends IterativeRobot {
             bot.eye.enable(false);
             bot.aic.enable = false;
         } else if (autoShoot) {
-            if (!autoSpeed) {
-                bot.shootController.shoot(shooterSpeed, -1);
-            } else {
-                bot.shootController.shootDist(bot.eye.getHighestTarget().distance, 1);
-            }
+            bot.shooter.voltageControl(shooterSpeed);
         } else {
             bot.shooter.setVelocity(0);
+            bot.shooter.voltageControl(0);
 
-            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON) || gamepad.getRawButton(6)) {
+            if (funbox.getDigital(DriverStationUserInterface.PORTS.INTAKE_BELT_BUTTON) || leftJoy.getRawButton(2)) {
                 bot.intake.setIntake(-intakeSpeed);
-            } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON) || gamepad.getRawButton(5)) {
+            } else if (funbox.getDigital(DriverStationUserInterface.PORTS.RELEASE_BELT_BUTTON) || leftJoy.getRawButton(3)) {
                 bot.intake.setIntake(intakeSpeed);
             } else {
                 bot.intake.setIntake(0);
