@@ -48,6 +48,7 @@ public class Robot {
         shooter = new Shooter();     
         ps_bot.println("Shooter initialized!");
         
+        
         //Intake instantiation
         intake = new Intake();        
         ps_bot.println("Intake initialized!");
@@ -56,7 +57,7 @@ public class Robot {
         turret = new Turret();        
         ps_bot.println("Turret initialized!");
         eye = new EagleEye();        
-        eye.start();
+        //eye.start();
         ps_bot.println("Vision initialized!");
          
         //Eagle Eye Instantiation
@@ -79,7 +80,7 @@ public class Robot {
      * will be common between autonomous and teleoperated modes. 
      */
     public void run() {
-        shooter.update();
+        //shooter.update();
         
 //        comp_dash.addInt(eye.getNumberOfTargets());
 //        comp_dash.addBoolean(false);

@@ -28,6 +28,9 @@ public class Shooter extends Thread {
     private PrintStream m_print = new PrintStream("[SHOOTER] ");
     private MovingAverage velFilt = new MovingAverage(8);
     private double DEFAULT_VRAMP_RATE = 48;
+    
+    private double errorTolerance = 50.0;
+    
     /*************************************
      * SHOOTER PID CONSTANTS ARE HERE:
      * ***********************************
@@ -105,7 +108,10 @@ public class Shooter extends Thread {
                 vel = 0;
             }
             
-            m_print.println("Velocity: " + vel);
+//            m_print.println("V: " + vel);
+//            m_print.println("C: " + ((m_shooterA.getOutputCurrent() + m_shooterB.getOutputCurrent())/2));
+//          
+            velocity = vel;
 
             return vel; //* scalar;              //Scales value to reasonable values
         } catch (Exception e) {
@@ -134,6 +140,8 @@ public class Shooter extends Thread {
     public void update() {
         update(kP, kI, kD, kF);    //Update shooter PID controller
     }
+    
+    double velocity = 0;
 
     /**
      * Speed control algorithm
@@ -144,10 +152,11 @@ public class Shooter extends Thread {
      */
     public void update(double P, double I, double D, double K) {
         long startTime = System.currentTimeMillis();
+        velocity = getEncoderRate();
 
         prevPrevErr = prevErr;
         prevErr = err;
-        err = setPointV - Math.abs(getEncoderRate());
+        err = setPointV - Math.abs(velocity);
 
         try {
             if (Math.abs(err) > 200) {
@@ -202,6 +211,7 @@ public class Shooter extends Thread {
         //Todo: some scaling in here for the input
         //For now, let's assume the rpm per volt is linear for the motors
         output = EagleMath.map((float) rpm, 0, 3500, 0, 1);
+        
         try { 
             setWheelVoltage(output);
         } catch(Exception e) {
@@ -217,16 +227,13 @@ public class Shooter extends Thread {
             setWheelVoltage(0);
         }
     }
-
+    
     /**
      * returns true if the shooter is within 100 rpm of the target speed
      * @return 
      */
     public boolean isAtTargetSpeed() {
-        return (Math.abs(err) < 275); /*&& 
-        Math.abs(prevErr) < 150 && 
-        Math.abs(prevPrevErr) < 200 && 
-        !(setPointV != 0));*/
+        return (Math.abs(err) < errorTolerance) && (setPointV != 0);
     }
 
     /**
@@ -246,6 +253,7 @@ public class Shooter extends Thread {
     private boolean enabled = true;
 
     /**
+     * 
      * Enable the shooter 
      * @param enabled 
      */
@@ -266,6 +274,20 @@ public class Shooter extends Thread {
             m_print.println("Position: " + m_shooterA.getPosition());
             m_print.println("Velocity: " + getEncoderRate());
             m_print.println("AvgError: " + (err + prevErr + prevPrevErr) / 3);
+        } catch (Exception e) {
+        }
+    }
+    public void printCsv() {
+        getEncoderRate();
+        try {
+            m_print.print(System.currentTimeMillis() + ",");
+            m_print.print(velocity + ",");                                                          //Velocity
+            //m_print.print(out + ",");                                                               //PID output
+            m_print.print((m_shooterA.getOutputVoltage()+m_shooterA.getOutputVoltage())/2 + ",");   //Average output voltage
+            m_print.print((m_shooterA.getOutputCurrent()+m_shooterA.getOutputCurrent())/2 + ",");   //Average output current
+            m_print.print((m_shooterA.getBusVoltage()+m_shooterA.getBusVoltage())/2 + ",");         //Average bus voltage
+            System.out.println(";");
+            
         } catch (Exception e) {
         }
     }

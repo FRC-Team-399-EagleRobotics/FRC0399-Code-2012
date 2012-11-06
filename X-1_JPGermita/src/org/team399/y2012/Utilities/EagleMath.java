@@ -35,6 +35,13 @@ public class EagleMath {
     public static boolean isInBand(double input, double low, double high) {
         return input > low && input < high;
     }
+    
+    public static double deadband(double in, double width) {
+        if(Math.abs(in) < width) {
+            in = 0;
+        }
+        return in;
+    }
 
     /**
      * Collapse number down to +1 0 or -1 depending on sign. Typically used in

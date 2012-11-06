@@ -19,7 +19,7 @@ public class Turret {
     private CANJaguar m_turret;
     //private double p = -100.0, i = 0.0, d = -1.7, deadband = .25;
     public double positionRaw = 5.0;
-    private double errorTolerance = .05;
+    private double errorTolerance = .2;
     private PrintStream m_print = new PrintStream("[Turret] ");
     private MovingAverage actualFilter = new MovingAverage(2);
     private MovingAverage setFilter = new MovingAverage(1);

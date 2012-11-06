@@ -27,13 +27,13 @@ public class ShootTwoBalls {
     public static void run() {
 
         // Speed of shooter, need to test
-        double RPM = 3000;
+        double RPM = 2750;
 
 
         double delay = 1.5;             //delay so shooters get up to speed
         double conveystop = 2;          //stop the roller let the shooter catch up
         double conveystart = 2.5;       //start the roller to shoot
-        double stopshoot = 4.5;         //stop shooting balls
+        double stopshoot = 7.5;         //stop shooting balls
 
 
         // Set shooter                                
@@ -56,7 +56,11 @@ public class ShootTwoBalls {
         //start the conveyor after the shooter spins up
         if (System.currentTimeMillis() - startTime > delay * 1000
                 && System.currentTimeMillis() - startTime < conveystop * 1000) {
-            Main.bot.intake.setIntake(-1);
+            if(Main.bot.shooter.isAtTargetSpeed()) {
+                Main.bot.intake.setIntake(-1);
+            } else {
+                Main.bot.intake.setIntake(0);
+            }
         }
 
         //stop the conveyor for split second
@@ -67,8 +71,13 @@ public class ShootTwoBalls {
 
         //start the conveyor
         if (System.currentTimeMillis() - startTime > conveystart * 1000
-                && System.currentTimeMillis() - startTime < stopshoot * 1000) {
-            Main.bot.intake.setIntake(-1);
+                && System.currentTimeMillis() - startTime < stopshoot * 1000
+                && Main.bot.shooter.isAtTargetSpeed()) {
+            if(Main.bot.shooter.isAtTargetSpeed()) {
+                Main.bot.intake.setIntake(-1);
+            } else {
+                Main.bot.intake.setIntake(0);
+            }
         }
 
 //        //stop conveyor and shooter

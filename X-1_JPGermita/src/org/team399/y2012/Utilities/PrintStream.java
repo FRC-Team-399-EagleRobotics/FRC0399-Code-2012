@@ -42,4 +42,8 @@ public class PrintStream {
     public void println(String data) {
         System.out.println(prefix + data + suffix);
     }
+    
+    public void print(String data)  {
+        System.out.print(data);
+    }
 }
